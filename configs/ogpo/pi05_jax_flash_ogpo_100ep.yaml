@@ -1,0 +1,109 @@
+include: configs/ogpo/pi05_jax_flash_ogpo.yaml
+
+data:
+  dataset_path: outputs/ogpo/click_mouse_pi05_replay_100ep_train.pt
+  validation_path: outputs/ogpo/click_mouse_pi05_replay_100ep_validation.pt
+  gamma: 0.9999
+
+critic:
+  stage: full_td
+  q_loss: mse
+  bootstrap_target: ensemble_mean
+  # The preceding Slurm job gates the calibrated critic on the full
+  # validation replay. Do not override that decision with a noisy fixed
+  # 32-transition actor-side sample.
+  # Never bypass validation for the formal DIVL actor route. These thresholds
+  # match the balanced TD10 critic checkpoint-selection gate.
+  force_actor: false
+  min_ranking_accuracy: 0.60
+  min_q_rank_correlation: 0.15
+  # This evaluator gap is measured against MC return. TD10 intentionally
+  # assigns partial value to useful prefixes from eventually failed episodes,
+  # so keep it as a loose gross-miscalibration guard rather than a TD gate.
+  max_abs_q_exploitation_gap: 0.30
+  min_coverage: 0.80
+  max_categorical_saturation: 0.20
+  # The formal critic has already consumed this fixed replay for 15k steps.
+  # Keep it fixed while optimizing the actor; no new online data arrive here.
+  steps_per_actor_step: 0
+  reference_value_samples: 0
+  lambda_divl_target: 1.0
+  lambda_mc: 0.0
+  backbone:
+    train_siglip: true
+    train_vlm_full: true
+    gradient_checkpointing: true
+  gemma_lora:
+    final_n_layers: 0
+
+divl:
+  num_atoms: 201
+  auto_support: false
+  v_min: -0.1
+  v_max: 1.1
+  alpha_min: 0.5
+  alpha_max: 0.6
+  entropy_temperature: 0.3
+  alpha_mode: lwd_linear
+  interpolate_quantile: false
+
+regularization:
+  # OGPO+ anchors the actor on verified successes. Anchoring the complete
+  # replay would also clone the 41 failed click_mouse episodes and adds a
+  # second full PI0.5 backward pass.
+  lambda_fm: 0.0
+  lambda_success: 0.02
+  # Success BC remains the OGPO+ anchor, but one full PI0.5 backward every
+  # actor step is retained in the baseline profile used by Job 787355.
+  # Bound the weighted success-BC gradient independently so it cannot hide a
+  # zero PPO signal and move the full PI0.5 actor outside the KL trust region.
+  success_weighted_grad_max_norm: 0.2
+
+training:
+  actor_steps: 500
+  batch_size: 1
+  checkpoint_interval: 10
+  critic_checkpoint: outputs/ogpo/click_mouse_gemma_udivl_100ep_calibrated.pt
+  checkpoint_path: outputs/ogpo/click_mouse_pi05_jax_flash_100ep.pt
+  metrics_path: outputs/ogpo/click_mouse_pi05_jax_flash_100ep_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/click_mouse_pi05_jax_flash_100ep
+
+evaluation:
+  # A fixed, episode-balanced gate is much less noisy than the former 32
+  # uniformly sampled transitions. Critic forward remains microbatched.
+  actor_gate_batch_size: 256
+  actor_gate_inference_batch_size: 8
+  actor_gate_sampling:
+    balanced: true
+    uniform_fraction: 0.5
+    success_fraction: 0.25
+    terminal_success_fraction: 0.125
+    failure_fraction: 0.125
+
+actor:
+  # Draw four actions for each replay state so the three Q-V heads can form a
+  # useful two-sided, within-state conservative advantage. Backpropagate one
+  # candidate at a time to keep full PI0.5 finetuning within A100-40G memory.
+  candidate_group_size: 4
+  gradient_microbatch_size: 1
+  # The preceding 5e-6 run reached reference KL 0.58 in eight updates.
+  learning_rate: 0.000001
+  # Measure KL after each proposed update. If it exceeds the trust region,
+  # atomically restore both actor parameters and the Adafactor state.
+  reject_update_on_kl: true
+  # The target is diagnostic; the hard limit atomically rolls back actor and
+  # Adafactor state. This controller is independent of ustate.
+  target_policy_reference_kl: 0.05
+  max_policy_reference_kl: 0.10
+  max_consecutive_kl_rejections: 3
+  # With one PPO epoch per rollout, the behavior policy can be hard-synced
+  # after each update. An EMA old policy materializes a third full PI0.5
+  # parameter copy (current + reference + EMA old) and OOMs A100-40G.
+  old_policy_sync_period: 1
+  old_policy_ema: 0.0
+  # The old policy is identical to current at each checkpoint boundary.
+  checkpoint_old_policy: false
+  jax_gc_between_steps: true
+  # Full-model XLA executables otherwise retain the previous immutable actor
+  # buffers and add roughly 7GB of live device memory per outer step.
+  jax_clear_caches_between_steps: true

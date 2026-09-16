@@ -1,0 +1,18 @@
+{
+  "episode_index": 7,
+  "prompt": "Put the hard black box for card deck to the right of the rectangular brown box for coffee.",
+  "success": false,
+  "num_frames": 0,
+  "num_environment_steps": 400,
+  "num_policy_chunks": 8,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "place_a2b_right",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 9200052,
+  "policy_noise_seed": 202609127046,
+  "ogpo_checkpoint": null
+}

@@ -1,0 +1,10 @@
+include: configs/ogpo/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k.yaml
+
+# Retry on the A100-80G hardware class after the unchanged recipe exhausted
+# A100-40G memory before its first actor update.
+training:
+  checkpoint_path: outputs/ogpo/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G_final.pt
+  periodic_checkpoint_dir: outputs/ogpo/checkpoints/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G
+  metrics_path: outputs/ogpo/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G
+  config_snapshot_path: outputs/ogpo/checkpoints/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G/resolved_config.yaml

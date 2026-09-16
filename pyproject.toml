@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ogpo-robot"
+version = "0.1.0"
+description = "Offline Generative Policy Optimization critics and actor training for PI0.5/RoboTwin"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "MIT" }
+authors = [{ name = "OGPO contributors" }]
+dependencies = [
+  "torch>=2.7.0",
+  "jax[cuda12]==0.5.3",
+  "flax==0.10.2",
+  "optax",
+  "orbax-checkpoint==0.11.13",
+  "numpy>=1.26.4",
+  "scipy",
+  "pyyaml",
+  "zarr<3",
+  "numcodecs",
+  "tensorboard",
+  "tqdm",
+  "einops",
+  "pillow",
+  "opencv-python",
+  "transformers==4.53.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.urls]
+Repository = "https://github.com/Starsshine21/ogpo"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ogpo"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

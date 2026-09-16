@@ -1,0 +1,18 @@
+{
+  "episode_index": 8,
+  "prompt": "Pick the bottle with red screw cap with one arm, the green plastic bottle with ridged bottom with the other.",
+  "success": true,
+  "num_frames": 0,
+  "num_environment_steps": 117,
+  "num_policy_chunks": 3,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "pick_dual_bottles",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 5700062,
+  "policy_noise_seed": 202609120060,
+  "ogpo_checkpoint": null
+}

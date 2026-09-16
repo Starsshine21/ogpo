@@ -1,0 +1,18 @@
+{
+  "episode_index": 5,
+  "prompt": "Grab the bottle with red screw cap and the green bottle with arms.",
+  "success": false,
+  "num_frames": 0,
+  "num_environment_steps": 400,
+  "num_policy_chunks": 8,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "pick_dual_bottles",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 5700059,
+  "policy_noise_seed": 202609120057,
+  "ogpo_checkpoint": null
+}

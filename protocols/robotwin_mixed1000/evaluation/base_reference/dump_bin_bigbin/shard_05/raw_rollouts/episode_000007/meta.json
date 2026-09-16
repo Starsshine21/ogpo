@@ -1,0 +1,18 @@
+{
+  "episode_index": 7,
+  "prompt": "Grab the tabletrashbin for tabletop use and pour into big bin",
+  "success": true,
+  "num_frames": 0,
+  "num_environment_steps": 443,
+  "num_policy_chunks": 9,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "dump_bin_bigbin",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 8100060,
+  "policy_noise_seed": 202609123072,
+  "ogpo_checkpoint": null
+}

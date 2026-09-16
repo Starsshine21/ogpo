@@ -1,0 +1,42 @@
+include: configs/ogpo/robotwin_click_bell_C8k_mt_headonly_actor_bs4_lr2e6_4k_A10080G.yaml
+
+data:
+  # One prepared MT shard is sufficient for this 10-step task-balanced signal
+  # probe and contains non-empty pools for all ten tasks.
+  dataset_path: outputs/ogpo/replays/robotwin_guess1000_nohanging_placeshoe_g995_n2_train_rank00.pt
+  validation_path: outputs/ogpo/replays/robotwin_guess1000_nohanging_placeshoe_model_init_8.pt
+  gamma_rebase:
+    enabled: false
+  apply_n_step_on_load: false
+
+critic:
+  steps_per_actor_step: 0
+  force_actor: true
+
+actor:
+  group_size: 4
+  candidate_group_size: 4
+  learning_rate: 2.0e-6
+
+regularization:
+  lambda_success: 0.0
+  lambda_fm: 0.0
+
+training:
+  resume_checkpoint: null
+  critic_checkpoint: outputs/ogpo/checkpoints/robotwin_multitask10_divl_vmean_headonly_taskoutcomebalanced_20k/milestones/critic_step_12000.pt
+  actor_steps: 10
+  batch_size: 4
+  checkpoint_interval: 0
+  save_final_checkpoint: false
+  actor_sampling:
+    mode: task_balanced_cycle
+    task_names: [pick_dual_bottles, handover_mic, place_cans_plasticbox, click_bell, dump_bin_bigbin, move_playingcard_away, open_laptop, click_alarmclock, place_a2b_right, place_shoe]
+  checkpoint_path: outputs/ogpo/robotwin_multitask10_Cbal12k_actor_probe_lr2e6_10step_A10080G_final.pt
+  periodic_checkpoint_dir: outputs/ogpo/checkpoints/robotwin_multitask10_Cbal12k_actor_probe_lr2e6_10step_A10080G
+  metrics_path: outputs/ogpo/robotwin_multitask10_Cbal12k_actor_probe_lr2e6_10step_A10080G_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/robotwin_multitask10_Cbal12k_actor_probe_lr2e6_10step_A10080G
+  config_snapshot_path: outputs/ogpo/checkpoints/robotwin_multitask10_Cbal12k_actor_probe_lr2e6_10step_A10080G/resolved_config.yaml
+
+evaluation:
+  tasks: [pick_dual_bottles, handover_mic, place_cans_plasticbox, click_bell, dump_bin_bigbin, move_playingcard_away, open_laptop, click_alarmclock, place_a2b_right, place_shoe]

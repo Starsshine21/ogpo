@@ -1,0 +1,921 @@
+{
+  "version": 1,
+  "task_name": "place_a2b_right",
+  "source_root": "<EVO_RL_ROOT>/dexjoco/outputs/robotwin_rollouts/guess/place_a2b_right",
+  "source_episode_selection": "first sorted source episodes",
+  "episode_count": 100,
+  "num_eval_shards": 8,
+  "eval_shard_counts": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    9
+  ],
+  "noise_protocol": "numpy.PCG64 SeedSequence([policy_noise_seed, policy_chunk_id]); standard_normal([50, model_action_dim], float32)",
+  "episodes": [
+    {
+      "shard": 0,
+      "episode_index": 0,
+      "seed": 9200000,
+      "prompt": "Put the small packet of playingcards to the right of the palm-sized phone with glossy finish",
+      "policy_noise_seed": 202609127000,
+      "source_shard": 0,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 0,
+      "episode_index": 1,
+      "seed": 9200001,
+      "prompt": "Set the compact tea box to the right of the box with coffee graphics.",
+      "policy_noise_seed": 202609127001,
+      "source_shard": 0,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 0,
+      "episode_index": 2,
+      "seed": 9200002,
+      "prompt": "Place the brown soap on the right of the smooth metal bell.",
+      "policy_noise_seed": 202609127002,
+      "source_shard": 0,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 0,
+      "episode_index": 3,
+      "seed": 9200004,
+      "prompt": "Grab the bread loaf with soft surface and place it right of the handheld phone with silver frame.",
+      "policy_noise_seed": 202609127003,
+      "source_shard": 0,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 0,
+      "episode_index": 4,
+      "seed": 9200005,
+      "prompt": "Put the bright blue soap bar to the right of the medium-sized bell",
+      "policy_noise_seed": 202609127004,
+      "source_shard": 0,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 0,
+      "episode_index": 5,
+      "seed": 9200006,
+      "prompt": "Grab the playingcards with red packaging and place it right of the white stapler.",
+      "policy_noise_seed": 202609127005,
+      "source_shard": 0,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 0,
+      "episode_index": 6,
+      "seed": 9200007,
+      "prompt": "Put the light yellow cleaning soap to the right of the mouse with scroll wheel.",
+      "policy_noise_seed": 202609127006,
+      "source_shard": 0,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 0,
+      "episode_index": 7,
+      "seed": 9200008,
+      "prompt": "Grab the dark gray wireless mouse and place it right of the oval-shaped soft bread.",
+      "policy_noise_seed": 202609127007,
+      "source_shard": 0,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 0,
+      "episode_index": 8,
+      "seed": 9200009,
+      "prompt": "Grab the smooth metal bell and place it right of the compact stapler.",
+      "policy_noise_seed": 202609127008,
+      "source_shard": 0,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 0,
+      "episode_index": 9,
+      "seed": 9200010,
+      "prompt": "Put the black stapler to the right of the compact toycar with rotating wheels.",
+      "policy_noise_seed": 202609127009,
+      "source_shard": 0,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 0,
+      "episode_index": 10,
+      "seed": 9200011,
+      "prompt": "Place the white stapler on the coffee box with dark brown top's right side.",
+      "policy_noise_seed": 202609127010,
+      "source_shard": 0,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 0,
+      "episode_index": 11,
+      "seed": 9200012,
+      "prompt": "Put the mouse with scroll wheel to the right of the hard black box for card deck.",
+      "policy_noise_seed": 202609127011,
+      "source_shard": 0,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 0,
+      "episode_index": 12,
+      "seed": 9200013,
+      "prompt": "Put the hand-sized rubikscube with colored squares to the right of the wireless mouse with left and right buttons.",
+      "policy_noise_seed": 202609127012,
+      "source_shard": 0,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 1,
+      "episode_index": 0,
+      "seed": 9200014,
+      "prompt": "Place the modern phone rightward of the printed light brown coffee-box using the right arm",
+      "policy_noise_seed": 202609127013,
+      "source_shard": 0,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 1,
+      "episode_index": 1,
+      "seed": 9200015,
+      "prompt": "Put the coffee-box with mug image to the right of the irregular woodenblock.",
+      "policy_noise_seed": 202609127014,
+      "source_shard": 0,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 1,
+      "episode_index": 2,
+      "seed": 9200016,
+      "prompt": "Put the black stapler to the right of the rectangular phone",
+      "policy_noise_seed": 202609127015,
+      "source_shard": 0,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 1,
+      "episode_index": 3,
+      "seed": 9200018,
+      "prompt": "Set the hand-sized dark gray mouse to the right of the palm-sized phone with glossy finish.",
+      "policy_noise_seed": 202609127016,
+      "source_shard": 0,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 1,
+      "episode_index": 4,
+      "seed": 9200019,
+      "prompt": "Put the handheld phone with silver frame to the right of the smooth soap.",
+      "policy_noise_seed": 202609127017,
+      "source_shard": 0,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 1,
+      "episode_index": 5,
+      "seed": 9200020,
+      "prompt": "Put the paper stapler with curved handle to the right of the phone with flat black screen.",
+      "policy_noise_seed": 202609127018,
+      "source_shard": 0,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 1,
+      "episode_index": 6,
+      "seed": 9200021,
+      "prompt": "Put the plastic stapler to the right of the hard black box for card deck.",
+      "policy_noise_seed": 202609127019,
+      "source_shard": 0,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 1,
+      "episode_index": 7,
+      "seed": 9200023,
+      "prompt": "Place the hand-sized dark gray mouse on the black tea-box with golden details's right side.",
+      "policy_noise_seed": 202609127020,
+      "source_shard": 0,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 1,
+      "episode_index": 8,
+      "seed": 9200024,
+      "prompt": "Put the teal toycar to the right of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609127021,
+      "source_shard": 0,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 1,
+      "episode_index": 9,
+      "seed": 9200025,
+      "prompt": "Grab the box with green leafy patterns and place it right of the rectangular playingcards case with patterns.",
+      "policy_noise_seed": 202609127022,
+      "source_shard": 0,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 1,
+      "episode_index": 10,
+      "seed": 9200026,
+      "prompt": "Put the medium-sized bell to the right of the soap bar shaped rectangular.",
+      "policy_noise_seed": 202609127023,
+      "source_shard": 0,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 1,
+      "episode_index": 11,
+      "seed": 9200027,
+      "prompt": "Place the wireless mouse with left and right buttons rightward of the small loaf-shaped bread using the right arm",
+      "policy_noise_seed": 202609127024,
+      "source_shard": 0,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 1,
+      "episode_index": 12,
+      "seed": 9200030,
+      "prompt": "Place the toycar with rounded edges rightward of the light beige cube using the left arm",
+      "policy_noise_seed": 202609127025,
+      "source_shard": 0,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 2,
+      "episode_index": 0,
+      "seed": 9200031,
+      "prompt": "Place the hand-sized wireless mouse on the soap bar shaped rectangular's right side.",
+      "policy_noise_seed": 202609127026,
+      "source_shard": 0,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 2,
+      "episode_index": 1,
+      "seed": 9200032,
+      "prompt": "Put the compact tea box to the right of the box with coffee mug design.",
+      "policy_noise_seed": 202609127027,
+      "source_shard": 0,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 2,
+      "episode_index": 2,
+      "seed": 9200033,
+      "prompt": "Grab the medium-sized bell and place it right of the oval-shaped soft bread.",
+      "policy_noise_seed": 202609127028,
+      "source_shard": 0,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 2,
+      "episode_index": 3,
+      "seed": 9200034,
+      "prompt": "Put the tea-box with smooth glossy finish to the right of the medium coffee-box.",
+      "policy_noise_seed": 202609127029,
+      "source_shard": 0,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 2,
+      "episode_index": 4,
+      "seed": 9200035,
+      "prompt": "Set the soap bar shaped rectangular to the right of the dark gray wireless mouse.",
+      "policy_noise_seed": 202609127030,
+      "source_shard": 0,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 2,
+      "episode_index": 5,
+      "seed": 9200036,
+      "prompt": "Put the small box for playingcards to the right of the hand-sized gray soap.",
+      "policy_noise_seed": 202609127031,
+      "source_shard": 0,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 2,
+      "episode_index": 6,
+      "seed": 9200037,
+      "prompt": "Put the rectangular stapler with curved corners to the right of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609127032,
+      "source_shard": 0,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 2,
+      "episode_index": 7,
+      "seed": 9200038,
+      "prompt": "Place the white stapler with metal tray rightward of the toycar with orange wheels using the left arm",
+      "policy_noise_seed": 202609127033,
+      "source_shard": 0,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 2,
+      "episode_index": 8,
+      "seed": 9200039,
+      "prompt": "Grab the rectangular playingcards case with patterns and place it right of the decorative golden tea box.",
+      "policy_noise_seed": 202609127034,
+      "source_shard": 0,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 2,
+      "episode_index": 9,
+      "seed": 9200040,
+      "prompt": "Put the dark gray wireless mouse to the right of the stapler with smooth plastic body.",
+      "policy_noise_seed": 202609127035,
+      "source_shard": 0,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 2,
+      "episode_index": 10,
+      "seed": 9200041,
+      "prompt": "Grab the beige box with golden decoration and place it right of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609127036,
+      "source_shard": 0,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 2,
+      "episode_index": 11,
+      "seed": 9200042,
+      "prompt": "Place the smooth textured coffee-box on the right of the hand-sized dark gray mouse.",
+      "policy_noise_seed": 202609127037,
+      "source_shard": 0,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 2,
+      "episode_index": 12,
+      "seed": 9200043,
+      "prompt": "Set the playingcards with red packaging on the right of the cube tea box with shiny embossed patterns.",
+      "policy_noise_seed": 202609127038,
+      "source_shard": 0,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 3,
+      "episode_index": 0,
+      "seed": 9200044,
+      "prompt": "Place the phone with rounded edges on the tea-box with smooth glossy finish's right side.",
+      "policy_noise_seed": 202609127039,
+      "source_shard": 0,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 3,
+      "episode_index": 1,
+      "seed": 9200046,
+      "prompt": "Place the bread with golden crust rightward of the printed light brown coffee-box using the right arm",
+      "policy_noise_seed": 202609127040,
+      "source_shard": 0,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 3,
+      "episode_index": 2,
+      "seed": 9200047,
+      "prompt": "Place the sealed coffee box with flat sides rightward of the oval-shaped soft bread using the left arm",
+      "policy_noise_seed": 202609127041,
+      "source_shard": 0,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 3,
+      "episode_index": 3,
+      "seed": 9200048,
+      "prompt": "Put the bread loaf medium-sized to the right of the pink toycar with white bumper.",
+      "policy_noise_seed": 202609127042,
+      "source_shard": 0,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 3,
+      "episode_index": 4,
+      "seed": 9200049,
+      "prompt": "Put the red plastic stapler to the right of the small loaf-shaped bread.",
+      "policy_noise_seed": 202609127043,
+      "source_shard": 0,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 3,
+      "episode_index": 5,
+      "seed": 9200050,
+      "prompt": "Put the blue and white stapler to the right of the braided top round bread.",
+      "policy_noise_seed": 202609127044,
+      "source_shard": 0,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 3,
+      "episode_index": 6,
+      "seed": 9200051,
+      "prompt": "Place the small hand-sized stapler on the small box for playingcards's right side.",
+      "policy_noise_seed": 202609127045,
+      "source_shard": 0,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 3,
+      "episode_index": 7,
+      "seed": 9200052,
+      "prompt": "Put the hard black box for card deck to the right of the rectangular brown box for coffee.",
+      "policy_noise_seed": 202609127046,
+      "source_shard": 0,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 3,
+      "episode_index": 8,
+      "seed": 9200053,
+      "prompt": "Set the handheld rubikscube on the right of the hand-size bright blue stapler.",
+      "policy_noise_seed": 202609127047,
+      "source_shard": 0,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 3,
+      "episode_index": 9,
+      "seed": 9200054,
+      "prompt": "Place the oval-shaped soft bread on the right of the medium irregular woodenblock.",
+      "policy_noise_seed": 202609127048,
+      "source_shard": 0,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 3,
+      "episode_index": 10,
+      "seed": 9200055,
+      "prompt": "Set the blue stapler for holding papers on the right of the modern phone.",
+      "policy_noise_seed": 202609127049,
+      "source_shard": 0,
+      "source_episode_index": 49
+    },
+    {
+      "shard": 3,
+      "episode_index": 11,
+      "seed": 9300000,
+      "prompt": "Place the red tea-box with golden designs on the spongy golden brown bread's right side.",
+      "policy_noise_seed": 202609127050,
+      "source_shard": 1,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 3,
+      "episode_index": 12,
+      "seed": 9300001,
+      "prompt": "Set the plastic stapler to the right of the rounded loaf bread.",
+      "policy_noise_seed": 202609127051,
+      "source_shard": 1,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 4,
+      "episode_index": 0,
+      "seed": 9300003,
+      "prompt": "Set the bread loaf with golden baked top on the right of the skincare soap bar.",
+      "policy_noise_seed": 202609127052,
+      "source_shard": 1,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 4,
+      "episode_index": 1,
+      "seed": 9300005,
+      "prompt": "Place the small stapler with simple design rightward of the rectangular silver phone with rounded edges using the left arm",
+      "policy_noise_seed": 202609127053,
+      "source_shard": 1,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 4,
+      "episode_index": 2,
+      "seed": 9300006,
+      "prompt": "Set the printed light brown coffee-box to the right of the toycar with rounded body.",
+      "policy_noise_seed": 202609127054,
+      "source_shard": 1,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 4,
+      "episode_index": 3,
+      "seed": 9300007,
+      "prompt": "Put the smooth soap to the right of the coffee box with dark brown top.",
+      "policy_noise_seed": 202609127055,
+      "source_shard": 1,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 4,
+      "episode_index": 4,
+      "seed": 9300008,
+      "prompt": "Set the wireless mouse with left and right buttons on the right of the multi-colored rubikscube.",
+      "policy_noise_seed": 202609127056,
+      "source_shard": 1,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 4,
+      "episode_index": 5,
+      "seed": 9300010,
+      "prompt": "Place the lightweight bell with smooth surface on the right of the dark phone with shiny finish.",
+      "policy_noise_seed": 202609127057,
+      "source_shard": 1,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 4,
+      "episode_index": 6,
+      "seed": 9300013,
+      "prompt": "Grab the plastic stapler and place it right of the phone with flat rectangular back.",
+      "policy_noise_seed": 202609127058,
+      "source_shard": 1,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 4,
+      "episode_index": 7,
+      "seed": 9300014,
+      "prompt": "Put the small hand-sized stapler to the right of the dark phone with shiny finish.",
+      "policy_noise_seed": 202609127059,
+      "source_shard": 1,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 4,
+      "episode_index": 8,
+      "seed": 9300015,
+      "prompt": "Grab the multi-colored rubikscube and place it right of the bread with golden crust.",
+      "policy_noise_seed": 202609127060,
+      "source_shard": 1,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 4,
+      "episode_index": 9,
+      "seed": 9300016,
+      "prompt": "Grab the bright green toycar and place it right of the handheld rubikscube.",
+      "policy_noise_seed": 202609127061,
+      "source_shard": 1,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 4,
+      "episode_index": 10,
+      "seed": 9300017,
+      "prompt": "Set the smooth metal bell to the right of the handheld rubikscube.",
+      "policy_noise_seed": 202609127062,
+      "source_shard": 1,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 4,
+      "episode_index": 11,
+      "seed": 9300018,
+      "prompt": "Put the hard black box for card deck to the right of the toy cube with orange and blue squares.",
+      "policy_noise_seed": 202609127063,
+      "source_shard": 1,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 4,
+      "episode_index": 12,
+      "seed": 9300019,
+      "prompt": "Grab the rounded loaf bread and place it right of the handheld rubikscube.",
+      "policy_noise_seed": 202609127064,
+      "source_shard": 1,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 5,
+      "episode_index": 0,
+      "seed": 9300021,
+      "prompt": "Place the toycar with smooth finish on the tea-box with small handle's right side.",
+      "policy_noise_seed": 202609127065,
+      "source_shard": 1,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 5,
+      "episode_index": 1,
+      "seed": 9300022,
+      "prompt": "Put the bell with raised round top to the right of the beige box with golden decoration",
+      "policy_noise_seed": 202609127066,
+      "source_shard": 1,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 5,
+      "episode_index": 2,
+      "seed": 9300024,
+      "prompt": "Set the dark gray wireless mouse to the right of the white-sided phone.",
+      "policy_noise_seed": 202609127067,
+      "source_shard": 1,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 5,
+      "episode_index": 3,
+      "seed": 9300025,
+      "prompt": "Put the rectangular silver phone with rounded edges to the right of the rubikscube with yellow top.",
+      "policy_noise_seed": 202609127068,
+      "source_shard": 1,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 5,
+      "episode_index": 4,
+      "seed": 9300026,
+      "prompt": "Set the rubikscube for twisting and turning on the right of the blue toycar with yellow buttons.",
+      "policy_noise_seed": 202609127069,
+      "source_shard": 1,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 5,
+      "episode_index": 5,
+      "seed": 9300027,
+      "prompt": "Set the smooth coffee box to the right of the rectangular red playingcards holder.",
+      "policy_noise_seed": 202609127070,
+      "source_shard": 1,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 5,
+      "episode_index": 6,
+      "seed": 9300028,
+      "prompt": "Set the white stapler with metal tray on the right of the square bread with light spots.",
+      "policy_noise_seed": 202609127071,
+      "source_shard": 1,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 5,
+      "episode_index": 7,
+      "seed": 9300029,
+      "prompt": "Put the coffee-box with orange circle to the right of the phone with flat rectangular back.",
+      "policy_noise_seed": 202609127072,
+      "source_shard": 1,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 5,
+      "episode_index": 8,
+      "seed": 9300030,
+      "prompt": "Put the soft block of bread to the right of the rubikscube with yellow top.",
+      "policy_noise_seed": 202609127073,
+      "source_shard": 1,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 5,
+      "episode_index": 9,
+      "seed": 9300031,
+      "prompt": "Set the small packet of playingcards on the right of the flat-bottomed mouse.",
+      "policy_noise_seed": 202609127074,
+      "source_shard": 1,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 5,
+      "episode_index": 10,
+      "seed": 9300032,
+      "prompt": "Grab the phone with flat rectangular back and place it right of the small rounded plastic mouse.",
+      "policy_noise_seed": 202609127075,
+      "source_shard": 1,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 5,
+      "episode_index": 11,
+      "seed": 9300033,
+      "prompt": "Set the turquoise and black tea-box on the right of the toycar with smooth finish.",
+      "policy_noise_seed": 202609127076,
+      "source_shard": 1,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 5,
+      "episode_index": 12,
+      "seed": 9300034,
+      "prompt": "Put the coffee-box with mug image to the right of the blue toycar.",
+      "policy_noise_seed": 202609127077,
+      "source_shard": 1,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 6,
+      "episode_index": 0,
+      "seed": 9300035,
+      "prompt": "Put the dark phone with shiny finish to the right of the sealed coffee box with flat sides.",
+      "policy_noise_seed": 202609127078,
+      "source_shard": 1,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 6,
+      "episode_index": 1,
+      "seed": 9300036,
+      "prompt": "Grab the hand-sized black-gray mouse and place it right of the hard black box for card deck.",
+      "policy_noise_seed": 202609127079,
+      "source_shard": 1,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 6,
+      "episode_index": 2,
+      "seed": 9300037,
+      "prompt": "Set the blue toycar with yellow buttons to the right of the dark gray computer mouse with logo.",
+      "policy_noise_seed": 202609127080,
+      "source_shard": 1,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 6,
+      "episode_index": 3,
+      "seed": 9300038,
+      "prompt": "Put the paper stapler with curved handle to the right of the light brown woodenblock.",
+      "policy_noise_seed": 202609127081,
+      "source_shard": 1,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 6,
+      "episode_index": 4,
+      "seed": 9300039,
+      "prompt": "Set the flat-bottomed mouse on the right of the palm-sized bell.",
+      "policy_noise_seed": 202609127082,
+      "source_shard": 1,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 6,
+      "episode_index": 5,
+      "seed": 9300040,
+      "prompt": "Place the light yellow cleaning soap on the right of the rubikscube with yellow top.",
+      "policy_noise_seed": 202609127083,
+      "source_shard": 1,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 6,
+      "episode_index": 6,
+      "seed": 9300041,
+      "prompt": "Grab the light yellow cleaning soap and place it right of the orange block paired with green triangular piece.",
+      "policy_noise_seed": 202609127084,
+      "source_shard": 1,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 6,
+      "episode_index": 7,
+      "seed": 9300042,
+      "prompt": "Place the gold text on playing cards box on the right of the bell with raised round top.",
+      "policy_noise_seed": 202609127085,
+      "source_shard": 1,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 6,
+      "episode_index": 8,
+      "seed": 9300043,
+      "prompt": "Set the dark gray wireless mouse on the right of the handheld rubikscube.",
+      "policy_noise_seed": 202609127086,
+      "source_shard": 1,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 6,
+      "episode_index": 9,
+      "seed": 9300044,
+      "prompt": "Grab the black tea-box with golden details and place it right of the hand-sized gray soap.",
+      "policy_noise_seed": 202609127087,
+      "source_shard": 1,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 6,
+      "episode_index": 10,
+      "seed": 9300046,
+      "prompt": "Grab the toy cube with orange and blue squares and place it right of the beige box with golden decoration.",
+      "policy_noise_seed": 202609127088,
+      "source_shard": 1,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 6,
+      "episode_index": 11,
+      "seed": 9300048,
+      "prompt": "Place the light yellow cleaning soap on the right of the black stapler.",
+      "policy_noise_seed": 202609127089,
+      "source_shard": 1,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 6,
+      "episode_index": 12,
+      "seed": 9300050,
+      "prompt": "Put the handheld rubikscube to the right of the rectangular playingcards pack.",
+      "policy_noise_seed": 202609127090,
+      "source_shard": 1,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 7,
+      "episode_index": 0,
+      "seed": 9300051,
+      "prompt": "Put the pink toycar with white bumper to the right of the gold text on playing cards box.",
+      "policy_noise_seed": 202609127091,
+      "source_shard": 1,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 7,
+      "episode_index": 1,
+      "seed": 9300052,
+      "prompt": "Place the medium bread loaf with soft crust on the soap with smooth grooves's right side.",
+      "policy_noise_seed": 202609127092,
+      "source_shard": 1,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 7,
+      "episode_index": 2,
+      "seed": 9300053,
+      "prompt": "Place the rubikscube with yellow top on the right of the white stapler.",
+      "policy_noise_seed": 202609127093,
+      "source_shard": 1,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 7,
+      "episode_index": 3,
+      "seed": 9300054,
+      "prompt": "Grab the beige box with golden decoration and place it right of the rectangular orange block with green triangle.",
+      "policy_noise_seed": 202609127094,
+      "source_shard": 1,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 7,
+      "episode_index": 4,
+      "seed": 9300056,
+      "prompt": "Grab the hand-sized dark gray mouse and place it right of the printed light brown coffee-box.",
+      "policy_noise_seed": 202609127095,
+      "source_shard": 1,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 7,
+      "episode_index": 5,
+      "seed": 9300057,
+      "prompt": "Set the rectangular storage box for coffee on the right of the medium bread loaf with soft crust.",
+      "policy_noise_seed": 202609127096,
+      "source_shard": 1,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 7,
+      "episode_index": 6,
+      "seed": 9300058,
+      "prompt": "Place the sealed coffee box with flat sides on the right of the tea-box with small handle.",
+      "policy_noise_seed": 202609127097,
+      "source_shard": 1,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 7,
+      "episode_index": 7,
+      "seed": 9300059,
+      "prompt": "Grab the rectangular playingcards pack and place it right of the flat-bottomed mouse.",
+      "policy_noise_seed": 202609127098,
+      "source_shard": 1,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 7,
+      "episode_index": 8,
+      "seed": 9300061,
+      "prompt": "Place the white coffee-box on the right of the tea-box with small handle.",
+      "policy_noise_seed": 202609127099,
+      "source_shard": 1,
+      "source_episode_index": 49
+    }
+  ]
+}

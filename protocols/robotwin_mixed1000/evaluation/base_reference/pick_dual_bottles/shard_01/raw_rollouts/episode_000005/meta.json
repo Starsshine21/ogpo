@@ -1,0 +1,18 @@
+{
+  "episode_index": 5,
+  "prompt": "Pick up the bottle with red screw cap and the green bottle simultaneously.",
+  "success": true,
+  "num_frames": 0,
+  "num_environment_steps": 116,
+  "num_policy_chunks": 3,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "pick_dual_bottles",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 5700020,
+  "policy_noise_seed": 202609120018,
+  "ogpo_checkpoint": null
+}

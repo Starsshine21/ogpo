@@ -1,0 +1,15 @@
+name: ogpo
+channels:
+  - conda-forge
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - git
+  - ffmpeg
+  - pip:
+      - -e .
+      - -e ./third_party/openpi
+      - -e ./third_party/openpi/packages/openpi-client
+

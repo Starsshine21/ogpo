@@ -1,0 +1,921 @@
+{
+  "version": 1,
+  "task_name": "click_bell",
+  "source_root": "<EVO_RL_ROOT>/dexjoco/outputs/robotwin_rollouts/guess/click_bell",
+  "source_episode_selection": "first sorted source episodes",
+  "episode_count": 100,
+  "num_eval_shards": 8,
+  "eval_shard_counts": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    9
+  ],
+  "noise_protocol": "numpy.PCG64 SeedSequence([policy_noise_seed, policy_chunk_id]); standard_normal([50, model_action_dim], float32)",
+  "episodes": [
+    {
+      "shard": 0,
+      "episode_index": 0,
+      "seed": 7700000,
+      "prompt": "Click the top center of the medium-sized bell.",
+      "policy_noise_seed": 202609060000,
+      "source_shard": 0,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 0,
+      "episode_index": 1,
+      "seed": 7700001,
+      "prompt": "Direct the right arm to click the palm-sized bell's top.",
+      "policy_noise_seed": 202609060001,
+      "source_shard": 0,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 0,
+      "episode_index": 2,
+      "seed": 7700002,
+      "prompt": "Find the lightweight bell with smooth surface and click its top center.",
+      "policy_noise_seed": 202609060002,
+      "source_shard": 0,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 0,
+      "episode_index": 3,
+      "seed": 7700003,
+      "prompt": "Direct the left arm to click the lightweight bell with smooth surface's top.",
+      "policy_noise_seed": 202609060003,
+      "source_shard": 0,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 0,
+      "episode_index": 4,
+      "seed": 7700004,
+      "prompt": "Click the top center of the lightweight bell with smooth surface.",
+      "policy_noise_seed": 202609060004,
+      "source_shard": 0,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 0,
+      "episode_index": 5,
+      "seed": 7700005,
+      "prompt": "Click the top center of the medium-sized bell.",
+      "policy_noise_seed": 202609060005,
+      "source_shard": 0,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 0,
+      "episode_index": 6,
+      "seed": 7700006,
+      "prompt": "Use the right arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060006,
+      "source_shard": 0,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 0,
+      "episode_index": 7,
+      "seed": 7700007,
+      "prompt": "Direct the right arm to click the palm-sized bell's top.",
+      "policy_noise_seed": 202609060007,
+      "source_shard": 0,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 0,
+      "episode_index": 8,
+      "seed": 7700008,
+      "prompt": "Click the top center of the smooth metal bell.",
+      "policy_noise_seed": 202609060008,
+      "source_shard": 0,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 0,
+      "episode_index": 9,
+      "seed": 7700009,
+      "prompt": "Click the top center of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609060009,
+      "source_shard": 0,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 0,
+      "episode_index": 10,
+      "seed": 7700010,
+      "prompt": "Use the right arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060010,
+      "source_shard": 0,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 0,
+      "episode_index": 11,
+      "seed": 7700011,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060011,
+      "source_shard": 0,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 0,
+      "episode_index": 12,
+      "seed": 7700012,
+      "prompt": "Use the left arm to press the blue bell with glossy finish's top center.",
+      "policy_noise_seed": 202609060012,
+      "source_shard": 0,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 1,
+      "episode_index": 0,
+      "seed": 7700013,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060013,
+      "source_shard": 0,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 1,
+      "episode_index": 1,
+      "seed": 7700014,
+      "prompt": "Use the right arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060014,
+      "source_shard": 0,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 1,
+      "episode_index": 2,
+      "seed": 7700015,
+      "prompt": "Use the right arm to press the blue bell with glossy finish's top center.",
+      "policy_noise_seed": 202609060015,
+      "source_shard": 0,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 1,
+      "episode_index": 3,
+      "seed": 7700016,
+      "prompt": "Use the left arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060016,
+      "source_shard": 0,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 1,
+      "episode_index": 4,
+      "seed": 7700017,
+      "prompt": "Click the medium-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060017,
+      "source_shard": 0,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 1,
+      "episode_index": 5,
+      "seed": 7700018,
+      "prompt": "Find the lightweight bell with smooth surface and click its top center.",
+      "policy_noise_seed": 202609060018,
+      "source_shard": 0,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 1,
+      "episode_index": 6,
+      "seed": 7700019,
+      "prompt": "Use the left arm to press the blue bell with glossy finish's top center.",
+      "policy_noise_seed": 202609060019,
+      "source_shard": 0,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 1,
+      "episode_index": 7,
+      "seed": 7700020,
+      "prompt": "Click the bell with raised round top's top center on the table.",
+      "policy_noise_seed": 202609060020,
+      "source_shard": 0,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 1,
+      "episode_index": 8,
+      "seed": 7700021,
+      "prompt": "Click the top center of the smooth metal bell.",
+      "policy_noise_seed": 202609060021,
+      "source_shard": 0,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 1,
+      "episode_index": 9,
+      "seed": 7700022,
+      "prompt": "Use the right arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060022,
+      "source_shard": 0,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 1,
+      "episode_index": 10,
+      "seed": 7700023,
+      "prompt": "Click the medium-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060023,
+      "source_shard": 0,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 1,
+      "episode_index": 11,
+      "seed": 7700024,
+      "prompt": "Direct the right arm to click the lightweight bell with smooth surface's top.",
+      "policy_noise_seed": 202609060024,
+      "source_shard": 0,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 1,
+      "episode_index": 12,
+      "seed": 7700025,
+      "prompt": "Use the left arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060025,
+      "source_shard": 0,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 2,
+      "episode_index": 0,
+      "seed": 7700026,
+      "prompt": "Use the right arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060026,
+      "source_shard": 0,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 2,
+      "episode_index": 1,
+      "seed": 7700027,
+      "prompt": "Use the left arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060027,
+      "source_shard": 0,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 2,
+      "episode_index": 2,
+      "seed": 7700028,
+      "prompt": "Use the right arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060028,
+      "source_shard": 0,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 2,
+      "episode_index": 3,
+      "seed": 7700029,
+      "prompt": "Use the right arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060029,
+      "source_shard": 0,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 2,
+      "episode_index": 4,
+      "seed": 7700030,
+      "prompt": "Direct the left arm to click the lightweight bell with smooth surface's top.",
+      "policy_noise_seed": 202609060030,
+      "source_shard": 0,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 2,
+      "episode_index": 5,
+      "seed": 7700031,
+      "prompt": "Click the blue bell with glossy finish's top center on the table.",
+      "policy_noise_seed": 202609060031,
+      "source_shard": 0,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 2,
+      "episode_index": 6,
+      "seed": 7700032,
+      "prompt": "Click the top center of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609060032,
+      "source_shard": 0,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 2,
+      "episode_index": 7,
+      "seed": 7700033,
+      "prompt": "Click the smooth metal bell's top center on the table.",
+      "policy_noise_seed": 202609060033,
+      "source_shard": 0,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 2,
+      "episode_index": 8,
+      "seed": 7700034,
+      "prompt": "Use the right arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060034,
+      "source_shard": 0,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 2,
+      "episode_index": 9,
+      "seed": 7700035,
+      "prompt": "Use the left arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060035,
+      "source_shard": 0,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 2,
+      "episode_index": 10,
+      "seed": 7700036,
+      "prompt": "Direct the right arm to click the bell with raised round top's top.",
+      "policy_noise_seed": 202609060036,
+      "source_shard": 0,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 2,
+      "episode_index": 11,
+      "seed": 7700037,
+      "prompt": "Find the bell with raised round top and click its top center.",
+      "policy_noise_seed": 202609060037,
+      "source_shard": 0,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 2,
+      "episode_index": 12,
+      "seed": 7700038,
+      "prompt": "Use the right arm to press the bell with raised round top's top center.",
+      "policy_noise_seed": 202609060038,
+      "source_shard": 0,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 3,
+      "episode_index": 0,
+      "seed": 7700039,
+      "prompt": "Find the lightweight bell with smooth surface and click its top center.",
+      "policy_noise_seed": 202609060039,
+      "source_shard": 0,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 3,
+      "episode_index": 1,
+      "seed": 7700040,
+      "prompt": "Find the lightweight bell with smooth surface and click its top center.",
+      "policy_noise_seed": 202609060040,
+      "source_shard": 0,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 3,
+      "episode_index": 2,
+      "seed": 7700041,
+      "prompt": "Use the right arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060041,
+      "source_shard": 0,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 3,
+      "episode_index": 3,
+      "seed": 7700042,
+      "prompt": "Use the right arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060042,
+      "source_shard": 0,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 3,
+      "episode_index": 4,
+      "seed": 7700043,
+      "prompt": "Use the right arm to press the bell with raised round top's top center.",
+      "policy_noise_seed": 202609060043,
+      "source_shard": 0,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 3,
+      "episode_index": 5,
+      "seed": 7700044,
+      "prompt": "Click the bell with raised round top's top center on the table.",
+      "policy_noise_seed": 202609060044,
+      "source_shard": 0,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 3,
+      "episode_index": 6,
+      "seed": 7700045,
+      "prompt": "Click the bell with raised round top's top center on the table.",
+      "policy_noise_seed": 202609060045,
+      "source_shard": 0,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 3,
+      "episode_index": 7,
+      "seed": 7700046,
+      "prompt": "Direct the left arm to click the blue bell with glossy finish's top.",
+      "policy_noise_seed": 202609060046,
+      "source_shard": 0,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 3,
+      "episode_index": 8,
+      "seed": 7700047,
+      "prompt": "Use the right arm to press the blue bell with glossy finish's top center.",
+      "policy_noise_seed": 202609060047,
+      "source_shard": 0,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 3,
+      "episode_index": 9,
+      "seed": 7700048,
+      "prompt": "Use the right arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060048,
+      "source_shard": 0,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 3,
+      "episode_index": 10,
+      "seed": 7700049,
+      "prompt": "Click the top center of the bell with raised round top.",
+      "policy_noise_seed": 202609060049,
+      "source_shard": 0,
+      "source_episode_index": 49
+    },
+    {
+      "shard": 3,
+      "episode_index": 11,
+      "seed": 7800000,
+      "prompt": "Click the bell with raised round top's top center on the table.",
+      "policy_noise_seed": 202609060050,
+      "source_shard": 1,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 3,
+      "episode_index": 12,
+      "seed": 7800001,
+      "prompt": "Click the medium-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060051,
+      "source_shard": 1,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 4,
+      "episode_index": 0,
+      "seed": 7800002,
+      "prompt": "Click the smooth metal bell's top center on the table.",
+      "policy_noise_seed": 202609060052,
+      "source_shard": 1,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 4,
+      "episode_index": 1,
+      "seed": 7800003,
+      "prompt": "Use the left arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060053,
+      "source_shard": 1,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 4,
+      "episode_index": 2,
+      "seed": 7800004,
+      "prompt": "Use the left arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060054,
+      "source_shard": 1,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 4,
+      "episode_index": 3,
+      "seed": 7800005,
+      "prompt": "Use the right arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060055,
+      "source_shard": 1,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 4,
+      "episode_index": 4,
+      "seed": 7800006,
+      "prompt": "Use the left arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060056,
+      "source_shard": 1,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 4,
+      "episode_index": 5,
+      "seed": 7800007,
+      "prompt": "Click the palm-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060057,
+      "source_shard": 1,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 4,
+      "episode_index": 6,
+      "seed": 7800008,
+      "prompt": "Find the palm-sized bell and click its top center.",
+      "policy_noise_seed": 202609060058,
+      "source_shard": 1,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 4,
+      "episode_index": 7,
+      "seed": 7800009,
+      "prompt": "Find the medium-sized bell and click its top center.",
+      "policy_noise_seed": 202609060059,
+      "source_shard": 1,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 4,
+      "episode_index": 8,
+      "seed": 7800010,
+      "prompt": "Find the palm-sized bell and click its top center.",
+      "policy_noise_seed": 202609060060,
+      "source_shard": 1,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 4,
+      "episode_index": 9,
+      "seed": 7800011,
+      "prompt": "Use the right arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060061,
+      "source_shard": 1,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 4,
+      "episode_index": 10,
+      "seed": 7800012,
+      "prompt": "Click the bell with raised round top's top center on the table.",
+      "policy_noise_seed": 202609060062,
+      "source_shard": 1,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 4,
+      "episode_index": 11,
+      "seed": 7800013,
+      "prompt": "Click the blue bell with glossy finish's top center on the table.",
+      "policy_noise_seed": 202609060063,
+      "source_shard": 1,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 4,
+      "episode_index": 12,
+      "seed": 7800014,
+      "prompt": "Click the smooth metal bell's top center on the table.",
+      "policy_noise_seed": 202609060064,
+      "source_shard": 1,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 5,
+      "episode_index": 0,
+      "seed": 7800015,
+      "prompt": "Direct the left arm to click the smooth metal bell's top.",
+      "policy_noise_seed": 202609060065,
+      "source_shard": 1,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 5,
+      "episode_index": 1,
+      "seed": 7800016,
+      "prompt": "Use the left arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060066,
+      "source_shard": 1,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 5,
+      "episode_index": 2,
+      "seed": 7800017,
+      "prompt": "Use the left arm to press the blue bell with glossy finish's top center.",
+      "policy_noise_seed": 202609060067,
+      "source_shard": 1,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 5,
+      "episode_index": 3,
+      "seed": 7800018,
+      "prompt": "Direct the left arm to click the bell with raised round top's top.",
+      "policy_noise_seed": 202609060068,
+      "source_shard": 1,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 5,
+      "episode_index": 4,
+      "seed": 7800019,
+      "prompt": "Click the top center of the palm-sized bell.",
+      "policy_noise_seed": 202609060069,
+      "source_shard": 1,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 5,
+      "episode_index": 5,
+      "seed": 7800020,
+      "prompt": "Use the right arm to press the smooth metal bell's top center.",
+      "policy_noise_seed": 202609060070,
+      "source_shard": 1,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 5,
+      "episode_index": 6,
+      "seed": 7800021,
+      "prompt": "Use the left arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060071,
+      "source_shard": 1,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 5,
+      "episode_index": 7,
+      "seed": 7800022,
+      "prompt": "Direct the left arm to click the palm-sized bell's top.",
+      "policy_noise_seed": 202609060072,
+      "source_shard": 1,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 5,
+      "episode_index": 8,
+      "seed": 7800023,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060073,
+      "source_shard": 1,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 5,
+      "episode_index": 9,
+      "seed": 7800024,
+      "prompt": "Click the medium-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060074,
+      "source_shard": 1,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 5,
+      "episode_index": 10,
+      "seed": 7800025,
+      "prompt": "Direct the right arm to click the bell with raised round top's top.",
+      "policy_noise_seed": 202609060075,
+      "source_shard": 1,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 5,
+      "episode_index": 11,
+      "seed": 7800026,
+      "prompt": "Use the left arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060076,
+      "source_shard": 1,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 5,
+      "episode_index": 12,
+      "seed": 7800027,
+      "prompt": "Use the right arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060077,
+      "source_shard": 1,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 6,
+      "episode_index": 0,
+      "seed": 7800028,
+      "prompt": "Click the top center of the palm-sized bell.",
+      "policy_noise_seed": 202609060078,
+      "source_shard": 1,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 6,
+      "episode_index": 1,
+      "seed": 7800029,
+      "prompt": "Use the left arm to press the medium-sized bell's top center.",
+      "policy_noise_seed": 202609060079,
+      "source_shard": 1,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 6,
+      "episode_index": 2,
+      "seed": 7800030,
+      "prompt": "Use the left arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060080,
+      "source_shard": 1,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 6,
+      "episode_index": 3,
+      "seed": 7800031,
+      "prompt": "Click the top center of the palm-sized bell.",
+      "policy_noise_seed": 202609060081,
+      "source_shard": 1,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 6,
+      "episode_index": 4,
+      "seed": 7800032,
+      "prompt": "Find the blue bell with glossy finish and click its top center.",
+      "policy_noise_seed": 202609060082,
+      "source_shard": 1,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 6,
+      "episode_index": 5,
+      "seed": 7800033,
+      "prompt": "Direct the left arm to click the bell with raised round top's top.",
+      "policy_noise_seed": 202609060083,
+      "source_shard": 1,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 6,
+      "episode_index": 6,
+      "seed": 7800034,
+      "prompt": "Use the right arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060084,
+      "source_shard": 1,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 6,
+      "episode_index": 7,
+      "seed": 7800035,
+      "prompt": "Click the top center of the bell with raised round top.",
+      "policy_noise_seed": 202609060085,
+      "source_shard": 1,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 6,
+      "episode_index": 8,
+      "seed": 7800036,
+      "prompt": "Use the left arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060086,
+      "source_shard": 1,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 6,
+      "episode_index": 9,
+      "seed": 7800037,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060087,
+      "source_shard": 1,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 6,
+      "episode_index": 10,
+      "seed": 7800038,
+      "prompt": "Click the top center of the blue bell with glossy finish.",
+      "policy_noise_seed": 202609060088,
+      "source_shard": 1,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 6,
+      "episode_index": 11,
+      "seed": 7800039,
+      "prompt": "Direct the right arm to click the smooth metal bell's top.",
+      "policy_noise_seed": 202609060089,
+      "source_shard": 1,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 6,
+      "episode_index": 12,
+      "seed": 7800040,
+      "prompt": "Click the top center of the palm-sized bell.",
+      "policy_noise_seed": 202609060090,
+      "source_shard": 1,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 7,
+      "episode_index": 0,
+      "seed": 7800041,
+      "prompt": "Use the right arm to press the lightweight bell with smooth surface's top center.",
+      "policy_noise_seed": 202609060091,
+      "source_shard": 1,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 7,
+      "episode_index": 1,
+      "seed": 7800042,
+      "prompt": "Click the blue bell with glossy finish's top center on the table.",
+      "policy_noise_seed": 202609060092,
+      "source_shard": 1,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 7,
+      "episode_index": 2,
+      "seed": 7800043,
+      "prompt": "Click the smooth metal bell's top center on the table.",
+      "policy_noise_seed": 202609060093,
+      "source_shard": 1,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 7,
+      "episode_index": 3,
+      "seed": 7800044,
+      "prompt": "Click the top center of the palm-sized bell.",
+      "policy_noise_seed": 202609060094,
+      "source_shard": 1,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 7,
+      "episode_index": 4,
+      "seed": 7800045,
+      "prompt": "Click the palm-sized bell's top center on the table.",
+      "policy_noise_seed": 202609060095,
+      "source_shard": 1,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 7,
+      "episode_index": 5,
+      "seed": 7800046,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060096,
+      "source_shard": 1,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 7,
+      "episode_index": 6,
+      "seed": 7800047,
+      "prompt": "Find the smooth metal bell and click its top center.",
+      "policy_noise_seed": 202609060097,
+      "source_shard": 1,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 7,
+      "episode_index": 7,
+      "seed": 7800048,
+      "prompt": "Find the palm-sized bell and click its top center.",
+      "policy_noise_seed": 202609060098,
+      "source_shard": 1,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 7,
+      "episode_index": 8,
+      "seed": 7800049,
+      "prompt": "Use the left arm to press the palm-sized bell's top center.",
+      "policy_noise_seed": 202609060099,
+      "source_shard": 1,
+      "source_episode_index": 49
+    }
+  ]
+}

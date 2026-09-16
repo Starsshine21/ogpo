@@ -1,0 +1,39 @@
+include: configs/ogpo/robotwin_pick_dual_bottles_pytorch_divl_critic_g995.yaml
+
+# Stage 1: one shared Gemma-270M + SigLIP-224 backbone with five independent
+# (Q1, Q2, categorical-V) head groups.  This config trains only the critic.
+critic:
+  ensemble_size: 5
+  expected_num_pairs: 5
+  expected_num_raw_q_heads: 10
+  double_q_divl: true
+  q_heads_per_member: 2
+  q_representation: scalar
+  categorical_q: false
+  enable_rankq: false
+  rankq: false
+  rank_consensus_enabled: false
+  bootstrap_probability: 1.0
+  q_correlation_log_period: 100
+
+divl:
+  num_atoms: 201
+  v_min: -0.1
+  v_max: 1.1
+  adaptive_tau: true
+  use_adaptive_quantile: true
+  tau_base: 0.6
+  entropy_coefficient: 0.3
+  tau_min: 0.3
+  tau_max: 0.6
+
+training:
+  critic_steps: 4000
+  checkpoint_path: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/critic_step_04000_final.pt
+  latest_checkpoint_path: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/latest.pt
+  best_checkpoint_path: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/best.pt
+  milestone_steps: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+  milestone_checkpoint_dir: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/milestones
+  metrics_path: outputs/ogpo/robotwin_pick_dual_bottles_divl_5pair_g995_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/robotwin_pick_dual_bottles_divl_5pair_g995
+  config_snapshot_path: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/resolved_config.yaml

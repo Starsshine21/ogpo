@@ -1,0 +1,921 @@
+{
+  "version": 1,
+  "task_name": "handover_mic",
+  "source_root": "<EVO_RL_ROOT>/dexjoco/outputs/robotwin_rollouts/guess/handover_mic",
+  "source_episode_selection": "first sorted source episodes",
+  "episode_count": 100,
+  "num_eval_shards": 8,
+  "eval_shard_counts": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    9
+  ],
+  "noise_protocol": "numpy.PCG64 SeedSequence([policy_noise_seed, policy_chunk_id]); standard_normal([50, model_action_dim], float32)",
+  "episodes": [
+    {
+      "shard": 0,
+      "episode_index": 0,
+      "seed": 7100000,
+      "prompt": "Pick up the microphone used for audio input and transfer it to the other hand.",
+      "policy_noise_seed": 202609121000,
+      "source_shard": 0,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 0,
+      "episode_index": 1,
+      "seed": 7100001,
+      "prompt": "Take hold of the switchable microphone with teal body and hand it over.",
+      "policy_noise_seed": 202609121001,
+      "source_shard": 0,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 0,
+      "episode_index": 2,
+      "seed": 7100003,
+      "prompt": "Use one arm to hold the black and white plastic microphone and hand it over.",
+      "policy_noise_seed": 202609121002,
+      "source_shard": 0,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 0,
+      "episode_index": 3,
+      "seed": 7100005,
+      "prompt": "Pick up the teal microphone with white bottom and hand it over",
+      "policy_noise_seed": 202609121003,
+      "source_shard": 0,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 0,
+      "episode_index": 4,
+      "seed": 7100006,
+      "prompt": "Grab the microphone used for audio input from the table and pass it across.",
+      "policy_noise_seed": 202609121004,
+      "source_shard": 0,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 0,
+      "episode_index": 5,
+      "seed": 7100007,
+      "prompt": "Take hold of the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121005,
+      "source_shard": 0,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 0,
+      "episode_index": 6,
+      "seed": 7100008,
+      "prompt": "Pick up the black and white plastic microphone and hand it over",
+      "policy_noise_seed": 202609121006,
+      "source_shard": 0,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 0,
+      "episode_index": 7,
+      "seed": 7100009,
+      "prompt": "Use one arm to hold the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121007,
+      "source_shard": 0,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 0,
+      "episode_index": 8,
+      "seed": 7100010,
+      "prompt": "Pick up the lightweight handheld microphone and hand it over",
+      "policy_noise_seed": 202609121008,
+      "source_shard": 0,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 0,
+      "episode_index": 9,
+      "seed": 7100011,
+      "prompt": "Pick up the switchable microphone with teal body and transfer it to the other hand.",
+      "policy_noise_seed": 202609121009,
+      "source_shard": 0,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 0,
+      "episode_index": 10,
+      "seed": 7100013,
+      "prompt": "Grab the microphone with cylindrical handle from the table and pass it over.",
+      "policy_noise_seed": 202609121010,
+      "source_shard": 0,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 0,
+      "episode_index": 11,
+      "seed": 7100014,
+      "prompt": "Use one arm to hold the compact microphone with two parts and hand it over.",
+      "policy_noise_seed": 202609121011,
+      "source_shard": 0,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 0,
+      "episode_index": 12,
+      "seed": 7100015,
+      "prompt": "Pick up the black and white plastic microphone and transfer it to the other hand.",
+      "policy_noise_seed": 202609121012,
+      "source_shard": 0,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 1,
+      "episode_index": 0,
+      "seed": 7100016,
+      "prompt": "Grab the long teal microphone with white grooves and pass it to the other arm.",
+      "policy_noise_seed": 202609121013,
+      "source_shard": 0,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 1,
+      "episode_index": 1,
+      "seed": 7100017,
+      "prompt": "Grab the microphone with cylindrical handle from the table and pass it across.",
+      "policy_noise_seed": 202609121014,
+      "source_shard": 0,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 1,
+      "episode_index": 2,
+      "seed": 7100018,
+      "prompt": "Take hold of the microphone with cylindrical handle and hand it over.",
+      "policy_noise_seed": 202609121015,
+      "source_shard": 0,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 1,
+      "episode_index": 3,
+      "seed": 7100019,
+      "prompt": "Take hold of the microphone used for audio input and hand it over.",
+      "policy_noise_seed": 202609121016,
+      "source_shard": 0,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 1,
+      "episode_index": 4,
+      "seed": 7100020,
+      "prompt": "Use one arm to hold the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121017,
+      "source_shard": 0,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 1,
+      "episode_index": 5,
+      "seed": 7100021,
+      "prompt": "Pick up the microphone with cylindrical handle and hand it over",
+      "policy_noise_seed": 202609121018,
+      "source_shard": 0,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 1,
+      "episode_index": 6,
+      "seed": 7100022,
+      "prompt": "Take hold of the switchable microphone with teal body and hand it over.",
+      "policy_noise_seed": 202609121019,
+      "source_shard": 0,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 1,
+      "episode_index": 7,
+      "seed": 7100023,
+      "prompt": "Grab the teal microphone with white bottom from the table and pass it over.",
+      "policy_noise_seed": 202609121020,
+      "source_shard": 0,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 1,
+      "episode_index": 8,
+      "seed": 7100024,
+      "prompt": "Take hold of the compact microphone with two parts and hand it over.",
+      "policy_noise_seed": 202609121021,
+      "source_shard": 0,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 1,
+      "episode_index": 9,
+      "seed": 7100026,
+      "prompt": "Use one arm to hold the switchable microphone with teal body and hand it over.",
+      "policy_noise_seed": 202609121022,
+      "source_shard": 0,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 1,
+      "episode_index": 10,
+      "seed": 7100027,
+      "prompt": "Grab the switchable microphone with teal body from the table and pass it over.",
+      "policy_noise_seed": 202609121023,
+      "source_shard": 0,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 1,
+      "episode_index": 11,
+      "seed": 7100028,
+      "prompt": "Take hold of the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121024,
+      "source_shard": 0,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 1,
+      "episode_index": 12,
+      "seed": 7100029,
+      "prompt": "Use one arm to hold the long teal microphone with white grooves and hand it over.",
+      "policy_noise_seed": 202609121025,
+      "source_shard": 0,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 2,
+      "episode_index": 0,
+      "seed": 7100030,
+      "prompt": "Grab the compact microphone with two parts and pass it to the other arm.",
+      "policy_noise_seed": 202609121026,
+      "source_shard": 0,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 2,
+      "episode_index": 1,
+      "seed": 7100031,
+      "prompt": "Take hold of the switchable microphone with teal body and hand it over.",
+      "policy_noise_seed": 202609121027,
+      "source_shard": 0,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 2,
+      "episode_index": 2,
+      "seed": 7100033,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121028,
+      "source_shard": 0,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 2,
+      "episode_index": 3,
+      "seed": 7100034,
+      "prompt": "Grab the microphone used for audio input from the table and pass it across.",
+      "policy_noise_seed": 202609121029,
+      "source_shard": 0,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 2,
+      "episode_index": 4,
+      "seed": 7100035,
+      "prompt": "Pick up the compact microphone with two parts and transfer it to the other hand.",
+      "policy_noise_seed": 202609121030,
+      "source_shard": 0,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 2,
+      "episode_index": 5,
+      "seed": 7100036,
+      "prompt": "Grab the handheld microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121031,
+      "source_shard": 0,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 2,
+      "episode_index": 6,
+      "seed": 7100037,
+      "prompt": "Take hold of the black and white plastic microphone and hand it over.",
+      "policy_noise_seed": 202609121032,
+      "source_shard": 0,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 2,
+      "episode_index": 7,
+      "seed": 7100039,
+      "prompt": "Grab the lightweight handheld microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121033,
+      "source_shard": 0,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 2,
+      "episode_index": 8,
+      "seed": 7100040,
+      "prompt": "Pick up the compact microphone with two parts and transfer it to the other hand.",
+      "policy_noise_seed": 202609121034,
+      "source_shard": 0,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 2,
+      "episode_index": 9,
+      "seed": 7100041,
+      "prompt": "Grab the black and white plastic microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121035,
+      "source_shard": 0,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 2,
+      "episode_index": 10,
+      "seed": 7100042,
+      "prompt": "Pick up the black and white plastic microphone and hand it over",
+      "policy_noise_seed": 202609121036,
+      "source_shard": 0,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 2,
+      "episode_index": 11,
+      "seed": 7100043,
+      "prompt": "Grab the switchable microphone with teal body and pass it to the other arm.",
+      "policy_noise_seed": 202609121037,
+      "source_shard": 0,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 2,
+      "episode_index": 12,
+      "seed": 7100044,
+      "prompt": "Pick up the compact microphone with two parts and hand it over",
+      "policy_noise_seed": 202609121038,
+      "source_shard": 0,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 3,
+      "episode_index": 0,
+      "seed": 7100045,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121039,
+      "source_shard": 0,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 3,
+      "episode_index": 1,
+      "seed": 7100046,
+      "prompt": "Take hold of the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121040,
+      "source_shard": 0,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 3,
+      "episode_index": 2,
+      "seed": 7100047,
+      "prompt": "Pick up the compact microphone with two parts and hand it over",
+      "policy_noise_seed": 202609121041,
+      "source_shard": 0,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 3,
+      "episode_index": 3,
+      "seed": 7100049,
+      "prompt": "Grab the teal microphone with white bottom from the table and pass it across.",
+      "policy_noise_seed": 202609121042,
+      "source_shard": 0,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 3,
+      "episode_index": 4,
+      "seed": 7100050,
+      "prompt": "Grab the teal microphone with white bottom from the table and pass it over.",
+      "policy_noise_seed": 202609121043,
+      "source_shard": 0,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 3,
+      "episode_index": 5,
+      "seed": 7100051,
+      "prompt": "Grab the long teal microphone with white grooves and pass it to the other arm.",
+      "policy_noise_seed": 202609121044,
+      "source_shard": 0,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 3,
+      "episode_index": 6,
+      "seed": 7100052,
+      "prompt": "Pick up the microphone used for audio input and hand it over",
+      "policy_noise_seed": 202609121045,
+      "source_shard": 0,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 3,
+      "episode_index": 7,
+      "seed": 7100054,
+      "prompt": "Grab the black and white plastic microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121046,
+      "source_shard": 0,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 3,
+      "episode_index": 8,
+      "seed": 7100055,
+      "prompt": "Pick up the compact microphone with two parts and hand it over",
+      "policy_noise_seed": 202609121047,
+      "source_shard": 0,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 3,
+      "episode_index": 9,
+      "seed": 7100056,
+      "prompt": "Grab the lightweight handheld microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121048,
+      "source_shard": 0,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 3,
+      "episode_index": 10,
+      "seed": 7100058,
+      "prompt": "Grab the lightweight handheld microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121049,
+      "source_shard": 0,
+      "source_episode_index": 49
+    },
+    {
+      "shard": 3,
+      "episode_index": 11,
+      "seed": 7200000,
+      "prompt": "Grab the handheld microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121050,
+      "source_shard": 1,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 3,
+      "episode_index": 12,
+      "seed": 7200001,
+      "prompt": "Grab the switchable microphone with teal body from the table and pass it across.",
+      "policy_noise_seed": 202609121051,
+      "source_shard": 1,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 4,
+      "episode_index": 0,
+      "seed": 7200002,
+      "prompt": "Grab the lightweight handheld microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121052,
+      "source_shard": 1,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 4,
+      "episode_index": 1,
+      "seed": 7200003,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121053,
+      "source_shard": 1,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 4,
+      "episode_index": 2,
+      "seed": 7200005,
+      "prompt": "Take hold of the black and white plastic microphone and hand it over.",
+      "policy_noise_seed": 202609121054,
+      "source_shard": 1,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 4,
+      "episode_index": 3,
+      "seed": 7200006,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121055,
+      "source_shard": 1,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 4,
+      "episode_index": 4,
+      "seed": 7200008,
+      "prompt": "Grab the handheld microphone from the table and pass it over.",
+      "policy_noise_seed": 202609121056,
+      "source_shard": 1,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 4,
+      "episode_index": 5,
+      "seed": 7200009,
+      "prompt": "Take hold of the lightweight handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121057,
+      "source_shard": 1,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 4,
+      "episode_index": 6,
+      "seed": 7200010,
+      "prompt": "Use one arm to hold the microphone with cylindrical handle and hand it over.",
+      "policy_noise_seed": 202609121058,
+      "source_shard": 1,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 4,
+      "episode_index": 7,
+      "seed": 7200011,
+      "prompt": "Pick up the black and white plastic microphone and transfer it to the other hand.",
+      "policy_noise_seed": 202609121059,
+      "source_shard": 1,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 4,
+      "episode_index": 8,
+      "seed": 7200012,
+      "prompt": "Take hold of the handheld microphone and hand it over.",
+      "policy_noise_seed": 202609121060,
+      "source_shard": 1,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 4,
+      "episode_index": 9,
+      "seed": 7200013,
+      "prompt": "Grab the compact microphone with two parts from the table and pass it over.",
+      "policy_noise_seed": 202609121061,
+      "source_shard": 1,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 4,
+      "episode_index": 10,
+      "seed": 7200014,
+      "prompt": "Grab the microphone used for audio input and pass it to the other arm.",
+      "policy_noise_seed": 202609121062,
+      "source_shard": 1,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 4,
+      "episode_index": 11,
+      "seed": 7200015,
+      "prompt": "Pick up the lightweight handheld microphone and transfer it to the other hand.",
+      "policy_noise_seed": 202609121063,
+      "source_shard": 1,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 4,
+      "episode_index": 12,
+      "seed": 7200016,
+      "prompt": "Grab the lightweight handheld microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121064,
+      "source_shard": 1,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 5,
+      "episode_index": 0,
+      "seed": 7200017,
+      "prompt": "Pick up the microphone used for audio input and transfer it to the other hand.",
+      "policy_noise_seed": 202609121065,
+      "source_shard": 1,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 5,
+      "episode_index": 1,
+      "seed": 7200018,
+      "prompt": "Use one arm to hold the microphone used for audio input and hand it over.",
+      "policy_noise_seed": 202609121066,
+      "source_shard": 1,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 5,
+      "episode_index": 2,
+      "seed": 7200019,
+      "prompt": "Use one arm to hold the microphone used for audio input and hand it over.",
+      "policy_noise_seed": 202609121067,
+      "source_shard": 1,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 5,
+      "episode_index": 3,
+      "seed": 7200021,
+      "prompt": "Grab the microphone with cylindrical handle from the table and pass it over.",
+      "policy_noise_seed": 202609121068,
+      "source_shard": 1,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 5,
+      "episode_index": 4,
+      "seed": 7200023,
+      "prompt": "Grab the lightweight handheld microphone from the table and pass it over.",
+      "policy_noise_seed": 202609121069,
+      "source_shard": 1,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 5,
+      "episode_index": 5,
+      "seed": 7200024,
+      "prompt": "Grab the compact microphone with two parts from the table and pass it across.",
+      "policy_noise_seed": 202609121070,
+      "source_shard": 1,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 5,
+      "episode_index": 6,
+      "seed": 7200026,
+      "prompt": "Use one arm to hold the microphone with cylindrical handle and hand it over.",
+      "policy_noise_seed": 202609121071,
+      "source_shard": 1,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 5,
+      "episode_index": 7,
+      "seed": 7200027,
+      "prompt": "Grab the teal microphone with white bottom and pass it to the other arm.",
+      "policy_noise_seed": 202609121072,
+      "source_shard": 1,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 5,
+      "episode_index": 8,
+      "seed": 7200028,
+      "prompt": "Use one arm to hold the long teal microphone with white grooves and hand it over.",
+      "policy_noise_seed": 202609121073,
+      "source_shard": 1,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 5,
+      "episode_index": 9,
+      "seed": 7200029,
+      "prompt": "Use one arm to hold the black and white plastic microphone and hand it over.",
+      "policy_noise_seed": 202609121074,
+      "source_shard": 1,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 5,
+      "episode_index": 10,
+      "seed": 7200030,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121075,
+      "source_shard": 1,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 5,
+      "episode_index": 11,
+      "seed": 7200032,
+      "prompt": "Pick up the teal microphone with white bottom and transfer it to the other hand.",
+      "policy_noise_seed": 202609121076,
+      "source_shard": 1,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 5,
+      "episode_index": 12,
+      "seed": 7200033,
+      "prompt": "Grab the teal microphone with white bottom and pass it to the other arm.",
+      "policy_noise_seed": 202609121077,
+      "source_shard": 1,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 6,
+      "episode_index": 0,
+      "seed": 7200034,
+      "prompt": "Grab the handheld microphone from the table and pass it over.",
+      "policy_noise_seed": 202609121078,
+      "source_shard": 1,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 6,
+      "episode_index": 1,
+      "seed": 7200035,
+      "prompt": "Use one arm to hold the switchable microphone with teal body and hand it over.",
+      "policy_noise_seed": 202609121079,
+      "source_shard": 1,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 6,
+      "episode_index": 2,
+      "seed": 7200036,
+      "prompt": "Pick up the microphone with cylindrical handle and transfer it to the other hand.",
+      "policy_noise_seed": 202609121080,
+      "source_shard": 1,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 6,
+      "episode_index": 3,
+      "seed": 7200037,
+      "prompt": "Grab the long teal microphone with white grooves from the table and pass it across.",
+      "policy_noise_seed": 202609121081,
+      "source_shard": 1,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 6,
+      "episode_index": 4,
+      "seed": 7200038,
+      "prompt": "Grab the compact microphone with two parts and pass it to the other arm.",
+      "policy_noise_seed": 202609121082,
+      "source_shard": 1,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 6,
+      "episode_index": 5,
+      "seed": 7200039,
+      "prompt": "Grab the long teal microphone with white grooves from the table and pass it over.",
+      "policy_noise_seed": 202609121083,
+      "source_shard": 1,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 6,
+      "episode_index": 6,
+      "seed": 7200041,
+      "prompt": "Grab the black and white plastic microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121084,
+      "source_shard": 1,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 6,
+      "episode_index": 7,
+      "seed": 7200042,
+      "prompt": "Pick up the microphone with cylindrical handle and transfer it to the other hand.",
+      "policy_noise_seed": 202609121085,
+      "source_shard": 1,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 6,
+      "episode_index": 8,
+      "seed": 7200043,
+      "prompt": "Grab the black and white plastic microphone and pass it to the other arm.",
+      "policy_noise_seed": 202609121086,
+      "source_shard": 1,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 6,
+      "episode_index": 9,
+      "seed": 7200044,
+      "prompt": "Grab the long teal microphone with white grooves from the table and pass it over.",
+      "policy_noise_seed": 202609121087,
+      "source_shard": 1,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 6,
+      "episode_index": 10,
+      "seed": 7200046,
+      "prompt": "Pick up the handheld microphone and transfer it to the other hand.",
+      "policy_noise_seed": 202609121088,
+      "source_shard": 1,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 6,
+      "episode_index": 11,
+      "seed": 7200048,
+      "prompt": "Pick up the long teal microphone with white grooves and transfer it to the other hand.",
+      "policy_noise_seed": 202609121089,
+      "source_shard": 1,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 6,
+      "episode_index": 12,
+      "seed": 7200050,
+      "prompt": "Grab the teal microphone with white bottom from the table and pass it over.",
+      "policy_noise_seed": 202609121090,
+      "source_shard": 1,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 7,
+      "episode_index": 0,
+      "seed": 7200052,
+      "prompt": "Grab the microphone with cylindrical handle and pass it to the other arm.",
+      "policy_noise_seed": 202609121091,
+      "source_shard": 1,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 7,
+      "episode_index": 1,
+      "seed": 7200053,
+      "prompt": "Grab the switchable microphone with teal body from the table and pass it across.",
+      "policy_noise_seed": 202609121092,
+      "source_shard": 1,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 7,
+      "episode_index": 2,
+      "seed": 7200054,
+      "prompt": "Grab the handheld microphone from the table and pass it across.",
+      "policy_noise_seed": 202609121093,
+      "source_shard": 1,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 7,
+      "episode_index": 3,
+      "seed": 7200055,
+      "prompt": "Grab the switchable microphone with teal body and pass it to the other arm.",
+      "policy_noise_seed": 202609121094,
+      "source_shard": 1,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 7,
+      "episode_index": 4,
+      "seed": 7200056,
+      "prompt": "Grab the compact microphone with two parts and pass it to the other arm.",
+      "policy_noise_seed": 202609121095,
+      "source_shard": 1,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 7,
+      "episode_index": 5,
+      "seed": 7200057,
+      "prompt": "Pick up the compact microphone with two parts and transfer it to the other hand.",
+      "policy_noise_seed": 202609121096,
+      "source_shard": 1,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 7,
+      "episode_index": 6,
+      "seed": 7200058,
+      "prompt": "Pick up the handheld microphone and hand it over",
+      "policy_noise_seed": 202609121097,
+      "source_shard": 1,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 7,
+      "episode_index": 7,
+      "seed": 7200061,
+      "prompt": "Pick up the microphone used for audio input and hand it over",
+      "policy_noise_seed": 202609121098,
+      "source_shard": 1,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 7,
+      "episode_index": 8,
+      "seed": 7200062,
+      "prompt": "Grab the long teal microphone with white grooves from the table and pass it across.",
+      "policy_noise_seed": 202609121099,
+      "source_shard": 1,
+      "source_episode_index": 49
+    }
+  ]
+}

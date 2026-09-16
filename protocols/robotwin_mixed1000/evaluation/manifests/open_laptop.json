@@ -1,0 +1,921 @@
+{
+  "version": 1,
+  "task_name": "open_laptop",
+  "source_root": "<EVO_RL_ROOT>/dexjoco/outputs/robotwin_rollouts/guess/open_laptop",
+  "source_episode_selection": "first sorted source episodes",
+  "episode_count": 100,
+  "num_eval_shards": 8,
+  "eval_shard_counts": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    9
+  ],
+  "noise_protocol": "numpy.PCG64 SeedSequence([policy_noise_seed, policy_chunk_id]); standard_normal([50, model_action_dim], float32)",
+  "episodes": [
+    {
+      "shard": 0,
+      "episode_index": 0,
+      "seed": 8600000,
+      "prompt": "Lift the rectangular laptop with smooth finish using the right arm.",
+      "policy_noise_seed": 202609125000,
+      "source_shard": 0,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 0,
+      "episode_index": 1,
+      "seed": 8600001,
+      "prompt": "Open the silver laptop carefully using the left arm.",
+      "policy_noise_seed": 202609125001,
+      "source_shard": 0,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 0,
+      "episode_index": 2,
+      "seed": 8600002,
+      "prompt": "Lift the sleek laptop using the right arm.",
+      "policy_noise_seed": 202609125002,
+      "source_shard": 0,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 0,
+      "episode_index": 3,
+      "seed": 8600003,
+      "prompt": "Open the hinged laptop with keyboard and screen with care",
+      "policy_noise_seed": 202609125003,
+      "source_shard": 0,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 0,
+      "episode_index": 4,
+      "seed": 8600004,
+      "prompt": "Lift the medium-sized laptop for portable use using the right arm.",
+      "policy_noise_seed": 202609125004,
+      "source_shard": 0,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 0,
+      "episode_index": 5,
+      "seed": 8600005,
+      "prompt": "Lift the silver laptop using the left arm",
+      "policy_noise_seed": 202609125005,
+      "source_shard": 0,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 0,
+      "episode_index": 6,
+      "seed": 8600007,
+      "prompt": "Lift the compact laptop with orange exterior's lid fully.",
+      "policy_noise_seed": 202609125006,
+      "source_shard": 0,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 0,
+      "episode_index": 7,
+      "seed": 8600008,
+      "prompt": "Lift the portable laptop's lid fully.",
+      "policy_noise_seed": 202609125007,
+      "source_shard": 0,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 0,
+      "episode_index": 8,
+      "seed": 8600009,
+      "prompt": "Open the rectangular laptop with smooth finish using the left arm.",
+      "policy_noise_seed": 202609125008,
+      "source_shard": 0,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 0,
+      "episode_index": 9,
+      "seed": 8600010,
+      "prompt": "Lift the black laptop using the right arm.",
+      "policy_noise_seed": 202609125009,
+      "source_shard": 0,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 0,
+      "episode_index": 10,
+      "seed": 8600011,
+      "prompt": "Open the portable Toshiba laptop with one motion.",
+      "policy_noise_seed": 202609125010,
+      "source_shard": 0,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 0,
+      "episode_index": 11,
+      "seed": 8600013,
+      "prompt": "Lift the foldable laptop's lid gently.",
+      "policy_noise_seed": 202609125011,
+      "source_shard": 0,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 0,
+      "episode_index": 12,
+      "seed": 8600014,
+      "prompt": "Lift the laptop with smooth edges and flat case's lid fully.",
+      "policy_noise_seed": 202609125012,
+      "source_shard": 0,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 1,
+      "episode_index": 0,
+      "seed": 8600015,
+      "prompt": "Lift the portable Toshiba laptop using the right arm.",
+      "policy_noise_seed": 202609125013,
+      "source_shard": 0,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 1,
+      "episode_index": 1,
+      "seed": 8600016,
+      "prompt": "Open the medium laptop with silver body using the right arm.",
+      "policy_noise_seed": 202609125014,
+      "source_shard": 0,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 1,
+      "episode_index": 2,
+      "seed": 8600017,
+      "prompt": "Grab the medium-sized black laptop and open it.",
+      "policy_noise_seed": 202609125015,
+      "source_shard": 0,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 1,
+      "episode_index": 3,
+      "seed": 8600018,
+      "prompt": "Pull up the laptop computer's lid.",
+      "policy_noise_seed": 202609125016,
+      "source_shard": 0,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 1,
+      "episode_index": 4,
+      "seed": 8600019,
+      "prompt": "Open the smooth black plastic laptop with care",
+      "policy_noise_seed": 202609125017,
+      "source_shard": 0,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 1,
+      "episode_index": 5,
+      "seed": 8600020,
+      "prompt": "Lift the medium laptop with black case using the right arm.",
+      "policy_noise_seed": 202609125018,
+      "source_shard": 0,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 1,
+      "episode_index": 6,
+      "seed": 8600021,
+      "prompt": "Open the black laptop slightly rounded at edges with one motion.",
+      "policy_noise_seed": 202609125019,
+      "source_shard": 0,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 1,
+      "episode_index": 7,
+      "seed": 8600023,
+      "prompt": "Open the laptop with glossy black display with one motion.",
+      "policy_noise_seed": 202609125020,
+      "source_shard": 0,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 1,
+      "episode_index": 8,
+      "seed": 8600024,
+      "prompt": "Open the portable laptop with care",
+      "policy_noise_seed": 202609125021,
+      "source_shard": 0,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 1,
+      "episode_index": 9,
+      "seed": 8600025,
+      "prompt": "Lift the medium laptop with black case using the left arm.",
+      "policy_noise_seed": 202609125022,
+      "source_shard": 0,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 1,
+      "episode_index": 10,
+      "seed": 8600026,
+      "prompt": "Open the medium laptop with silver body with one motion.",
+      "policy_noise_seed": 202609125023,
+      "source_shard": 0,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 1,
+      "episode_index": 11,
+      "seed": 8600027,
+      "prompt": "Open the foldable laptop with one motion.",
+      "policy_noise_seed": 202609125024,
+      "source_shard": 0,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 1,
+      "episode_index": 12,
+      "seed": 8600028,
+      "prompt": "Pull up the compact silver laptop's lid.",
+      "policy_noise_seed": 202609125025,
+      "source_shard": 0,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 2,
+      "episode_index": 0,
+      "seed": 8600029,
+      "prompt": "Lift the foldable laptop using the right arm.",
+      "policy_noise_seed": 202609125026,
+      "source_shard": 0,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 2,
+      "episode_index": 1,
+      "seed": 8600030,
+      "prompt": "Open the compact laptop with orange exterior with care",
+      "policy_noise_seed": 202609125027,
+      "source_shard": 0,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 2,
+      "episode_index": 2,
+      "seed": 8600031,
+      "prompt": "Lift the black laptop using the right arm",
+      "policy_noise_seed": 202609125028,
+      "source_shard": 0,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 2,
+      "episode_index": 3,
+      "seed": 8600032,
+      "prompt": "Lift the laptop with smooth edges and flat case's lid gently.",
+      "policy_noise_seed": 202609125029,
+      "source_shard": 0,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 2,
+      "episode_index": 4,
+      "seed": 8600034,
+      "prompt": "Lift the hinged laptop with keyboard and screen's lid fully.",
+      "policy_noise_seed": 202609125030,
+      "source_shard": 0,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 2,
+      "episode_index": 5,
+      "seed": 8600035,
+      "prompt": "Open the folding laptop with black keyboard carefully using the left arm.",
+      "policy_noise_seed": 202609125031,
+      "source_shard": 0,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 2,
+      "episode_index": 6,
+      "seed": 8600036,
+      "prompt": "Grab the portable laptop and open it.",
+      "policy_noise_seed": 202609125032,
+      "source_shard": 0,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 2,
+      "episode_index": 7,
+      "seed": 8600037,
+      "prompt": "Open the medium-sized laptop for portable use with one motion.",
+      "policy_noise_seed": 202609125033,
+      "source_shard": 0,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 2,
+      "episode_index": 8,
+      "seed": 8600038,
+      "prompt": "Pull up the foldable laptop's lid.",
+      "policy_noise_seed": 202609125034,
+      "source_shard": 0,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 2,
+      "episode_index": 9,
+      "seed": 8600039,
+      "prompt": "Pull up the black laptop fitting laptop bags's lid.",
+      "policy_noise_seed": 202609125035,
+      "source_shard": 0,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 2,
+      "episode_index": 10,
+      "seed": 8600040,
+      "prompt": "Open the laptop computer carefully using the right arm.",
+      "policy_noise_seed": 202609125036,
+      "source_shard": 0,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 2,
+      "episode_index": 11,
+      "seed": 8600041,
+      "prompt": "Lift the black laptop's lid fully.",
+      "policy_noise_seed": 202609125037,
+      "source_shard": 0,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 2,
+      "episode_index": 12,
+      "seed": 8600042,
+      "prompt": "Lift the sleek laptop's lid gently.",
+      "policy_noise_seed": 202609125038,
+      "source_shard": 0,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 3,
+      "episode_index": 0,
+      "seed": 8600043,
+      "prompt": "Open the portable laptop using the left arm.",
+      "policy_noise_seed": 202609125039,
+      "source_shard": 0,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 3,
+      "episode_index": 1,
+      "seed": 8600044,
+      "prompt": "Open the medium laptop with black case using the left arm.",
+      "policy_noise_seed": 202609125040,
+      "source_shard": 0,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 3,
+      "episode_index": 2,
+      "seed": 8600045,
+      "prompt": "Pull up the laptop with glossy black display's lid.",
+      "policy_noise_seed": 202609125041,
+      "source_shard": 0,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 3,
+      "episode_index": 3,
+      "seed": 8600046,
+      "prompt": "Lift the portable laptop's lid gently.",
+      "policy_noise_seed": 202609125042,
+      "source_shard": 0,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 3,
+      "episode_index": 4,
+      "seed": 8600047,
+      "prompt": "Open the smooth black plastic laptop with care",
+      "policy_noise_seed": 202609125043,
+      "source_shard": 0,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 3,
+      "episode_index": 5,
+      "seed": 8600048,
+      "prompt": "Lift the flat orange laptop using the right arm.",
+      "policy_noise_seed": 202609125044,
+      "source_shard": 0,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 3,
+      "episode_index": 6,
+      "seed": 8600050,
+      "prompt": "Grab the foldable laptop and open it.",
+      "policy_noise_seed": 202609125045,
+      "source_shard": 0,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 3,
+      "episode_index": 7,
+      "seed": 8600051,
+      "prompt": "Lift the black laptop fitting laptop bags using the right arm",
+      "policy_noise_seed": 202609125046,
+      "source_shard": 0,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 3,
+      "episode_index": 8,
+      "seed": 8600052,
+      "prompt": "Grab the laptop with glossy black display and open it.",
+      "policy_noise_seed": 202609125047,
+      "source_shard": 0,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 3,
+      "episode_index": 9,
+      "seed": 8600053,
+      "prompt": "Pull up the folding laptop with black keyboard's lid.",
+      "policy_noise_seed": 202609125048,
+      "source_shard": 0,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 3,
+      "episode_index": 10,
+      "seed": 8600054,
+      "prompt": "Open the rectangular laptop with smooth finish with one motion.",
+      "policy_noise_seed": 202609125049,
+      "source_shard": 0,
+      "source_episode_index": 49
+    },
+    {
+      "shard": 3,
+      "episode_index": 11,
+      "seed": 8700000,
+      "prompt": "Lift the laptop computer's lid gently.",
+      "policy_noise_seed": 202609125050,
+      "source_shard": 1,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 3,
+      "episode_index": 12,
+      "seed": 8700001,
+      "prompt": "Open the silver laptop with care",
+      "policy_noise_seed": 202609125051,
+      "source_shard": 1,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 4,
+      "episode_index": 0,
+      "seed": 8700002,
+      "prompt": "Lift the laptop with glossy black display using the left arm",
+      "policy_noise_seed": 202609125052,
+      "source_shard": 1,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 4,
+      "episode_index": 1,
+      "seed": 8700003,
+      "prompt": "Lift the laptop with glossy black display using the left arm",
+      "policy_noise_seed": 202609125053,
+      "source_shard": 1,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 4,
+      "episode_index": 2,
+      "seed": 8700004,
+      "prompt": "Lift the computer with black screen using the left arm.",
+      "policy_noise_seed": 202609125054,
+      "source_shard": 1,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 4,
+      "episode_index": 3,
+      "seed": 8700005,
+      "prompt": "Grab the smooth black plastic laptop and open it.",
+      "policy_noise_seed": 202609125055,
+      "source_shard": 1,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 4,
+      "episode_index": 4,
+      "seed": 8700006,
+      "prompt": "Open the compact silver laptop with care",
+      "policy_noise_seed": 202609125056,
+      "source_shard": 1,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 4,
+      "episode_index": 5,
+      "seed": 8700007,
+      "prompt": "Lift the foldable laptop's lid gently.",
+      "policy_noise_seed": 202609125057,
+      "source_shard": 1,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 4,
+      "episode_index": 6,
+      "seed": 8700008,
+      "prompt": "Lift the compact silver laptop's lid gently.",
+      "policy_noise_seed": 202609125058,
+      "source_shard": 1,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 4,
+      "episode_index": 7,
+      "seed": 8700010,
+      "prompt": "Lift the smooth black plastic laptop's lid fully.",
+      "policy_noise_seed": 202609125059,
+      "source_shard": 1,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 4,
+      "episode_index": 8,
+      "seed": 8700011,
+      "prompt": "Pull up the smooth black plastic laptop's lid.",
+      "policy_noise_seed": 202609125060,
+      "source_shard": 1,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 4,
+      "episode_index": 9,
+      "seed": 8700012,
+      "prompt": "Lift the foldable laptop using the right arm.",
+      "policy_noise_seed": 202609125061,
+      "source_shard": 1,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 4,
+      "episode_index": 10,
+      "seed": 8700013,
+      "prompt": "Lift the laptop with smooth edges and flat case using the right arm",
+      "policy_noise_seed": 202609125062,
+      "source_shard": 1,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 4,
+      "episode_index": 11,
+      "seed": 8700015,
+      "prompt": "Open the black laptop with one motion.",
+      "policy_noise_seed": 202609125063,
+      "source_shard": 1,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 4,
+      "episode_index": 12,
+      "seed": 8700016,
+      "prompt": "Lift the foldable laptop's lid fully.",
+      "policy_noise_seed": 202609125064,
+      "source_shard": 1,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 5,
+      "episode_index": 0,
+      "seed": 8700017,
+      "prompt": "Lift the black laptop's lid gently.",
+      "policy_noise_seed": 202609125065,
+      "source_shard": 1,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 5,
+      "episode_index": 1,
+      "seed": 8700019,
+      "prompt": "Open the portable laptop using the left arm.",
+      "policy_noise_seed": 202609125066,
+      "source_shard": 1,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 5,
+      "episode_index": 2,
+      "seed": 8700020,
+      "prompt": "Grab the sleek laptop and open it.",
+      "policy_noise_seed": 202609125067,
+      "source_shard": 1,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 5,
+      "episode_index": 3,
+      "seed": 8700021,
+      "prompt": "Open the foldable laptop using the right arm.",
+      "policy_noise_seed": 202609125068,
+      "source_shard": 1,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 5,
+      "episode_index": 4,
+      "seed": 8700022,
+      "prompt": "Pull up the thin rectangular laptop's lid.",
+      "policy_noise_seed": 202609125069,
+      "source_shard": 1,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 5,
+      "episode_index": 5,
+      "seed": 8700023,
+      "prompt": "Open the rectangular laptop with smooth finish with one motion.",
+      "policy_noise_seed": 202609125070,
+      "source_shard": 1,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 5,
+      "episode_index": 6,
+      "seed": 8700024,
+      "prompt": "Grab the medium-sized laptop for portable use and open it.",
+      "policy_noise_seed": 202609125071,
+      "source_shard": 1,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 5,
+      "episode_index": 7,
+      "seed": 8700028,
+      "prompt": "Lift the sleek laptop using the left arm.",
+      "policy_noise_seed": 202609125072,
+      "source_shard": 1,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 5,
+      "episode_index": 8,
+      "seed": 8700029,
+      "prompt": "Open the hinged laptop with keyboard and screen with one motion.",
+      "policy_noise_seed": 202609125073,
+      "source_shard": 1,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 5,
+      "episode_index": 9,
+      "seed": 8700031,
+      "prompt": "Grab the rectangular laptop with smooth finish and open it.",
+      "policy_noise_seed": 202609125074,
+      "source_shard": 1,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 5,
+      "episode_index": 10,
+      "seed": 8700033,
+      "prompt": "Open the black laptop with compact design using the left arm.",
+      "policy_noise_seed": 202609125075,
+      "source_shard": 1,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 5,
+      "episode_index": 11,
+      "seed": 8700035,
+      "prompt": "Lift the compact laptop with orange exterior's lid fully.",
+      "policy_noise_seed": 202609125076,
+      "source_shard": 1,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 5,
+      "episode_index": 12,
+      "seed": 8700036,
+      "prompt": "Lift the silver laptop's lid fully.",
+      "policy_noise_seed": 202609125077,
+      "source_shard": 1,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 6,
+      "episode_index": 0,
+      "seed": 8700037,
+      "prompt": "Lift the black laptop with compact design's lid gently.",
+      "policy_noise_seed": 202609125078,
+      "source_shard": 1,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 6,
+      "episode_index": 1,
+      "seed": 8700039,
+      "prompt": "Open the rectangular laptop with smooth finish with one motion.",
+      "policy_noise_seed": 202609125079,
+      "source_shard": 1,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 6,
+      "episode_index": 2,
+      "seed": 8700040,
+      "prompt": "Grab the sleek laptop and open it.",
+      "policy_noise_seed": 202609125080,
+      "source_shard": 1,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 6,
+      "episode_index": 3,
+      "seed": 8700041,
+      "prompt": "Open the medium laptop with silver body using the right arm.",
+      "policy_noise_seed": 202609125081,
+      "source_shard": 1,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 6,
+      "episode_index": 4,
+      "seed": 8700044,
+      "prompt": "Open the foldable laptop with one motion.",
+      "policy_noise_seed": 202609125082,
+      "source_shard": 1,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 6,
+      "episode_index": 5,
+      "seed": 8700045,
+      "prompt": "Pull up the folding laptop with black keyboard's lid.",
+      "policy_noise_seed": 202609125083,
+      "source_shard": 1,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 6,
+      "episode_index": 6,
+      "seed": 8700046,
+      "prompt": "Grab the black laptop fitting laptop bags and open it.",
+      "policy_noise_seed": 202609125084,
+      "source_shard": 1,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 6,
+      "episode_index": 7,
+      "seed": 8700047,
+      "prompt": "Open the laptop computer with care",
+      "policy_noise_seed": 202609125085,
+      "source_shard": 1,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 6,
+      "episode_index": 8,
+      "seed": 8700048,
+      "prompt": "Open the medium-sized laptop for portable use with one motion.",
+      "policy_noise_seed": 202609125086,
+      "source_shard": 1,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 6,
+      "episode_index": 9,
+      "seed": 8700050,
+      "prompt": "Grab the medium-sized laptop for portable use and open it.",
+      "policy_noise_seed": 202609125087,
+      "source_shard": 1,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 6,
+      "episode_index": 10,
+      "seed": 8700051,
+      "prompt": "Pull up the compact laptop with orange exterior's lid.",
+      "policy_noise_seed": 202609125088,
+      "source_shard": 1,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 6,
+      "episode_index": 11,
+      "seed": 8700052,
+      "prompt": "Lift the black laptop fitting laptop bags using the left arm.",
+      "policy_noise_seed": 202609125089,
+      "source_shard": 1,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 6,
+      "episode_index": 12,
+      "seed": 8700053,
+      "prompt": "Lift the compact silver laptop using the right arm",
+      "policy_noise_seed": 202609125090,
+      "source_shard": 1,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 7,
+      "episode_index": 0,
+      "seed": 8700055,
+      "prompt": "Open the compact silver laptop with one motion.",
+      "policy_noise_seed": 202609125091,
+      "source_shard": 1,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 7,
+      "episode_index": 1,
+      "seed": 8700056,
+      "prompt": "Lift the black laptop with shiny hinges using the right arm",
+      "policy_noise_seed": 202609125092,
+      "source_shard": 1,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 7,
+      "episode_index": 2,
+      "seed": 8700057,
+      "prompt": "Lift the portable laptop using the left arm.",
+      "policy_noise_seed": 202609125093,
+      "source_shard": 1,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 7,
+      "episode_index": 3,
+      "seed": 8700059,
+      "prompt": "Lift the black laptop's lid gently.",
+      "policy_noise_seed": 202609125094,
+      "source_shard": 1,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 7,
+      "episode_index": 4,
+      "seed": 8700060,
+      "prompt": "Open the laptop with colorful screen with care",
+      "policy_noise_seed": 202609125095,
+      "source_shard": 1,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 7,
+      "episode_index": 5,
+      "seed": 8700061,
+      "prompt": "Open the black laptop using the right arm.",
+      "policy_noise_seed": 202609125096,
+      "source_shard": 1,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 7,
+      "episode_index": 6,
+      "seed": 8700062,
+      "prompt": "Pull up the thin rectangular laptop's lid.",
+      "policy_noise_seed": 202609125097,
+      "source_shard": 1,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 7,
+      "episode_index": 7,
+      "seed": 8700063,
+      "prompt": "Open the portable laptop carefully using the left arm.",
+      "policy_noise_seed": 202609125098,
+      "source_shard": 1,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 7,
+      "episode_index": 8,
+      "seed": 8700065,
+      "prompt": "Open the laptop with smooth edges and flat case with care",
+      "policy_noise_seed": 202609125099,
+      "source_shard": 1,
+      "source_episode_index": 49
+    }
+  ]
+}

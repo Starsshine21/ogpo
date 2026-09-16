@@ -1,0 +1,18 @@
+{
+  "episode_index": 2,
+  "prompt": "Place the rubikscube with yellow top on the right of the white stapler.",
+  "success": true,
+  "num_frames": 0,
+  "num_environment_steps": 129,
+  "num_policy_chunks": 3,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "place_a2b_right",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 9300053,
+  "policy_noise_seed": 202609127093,
+  "ogpo_checkpoint": null
+}

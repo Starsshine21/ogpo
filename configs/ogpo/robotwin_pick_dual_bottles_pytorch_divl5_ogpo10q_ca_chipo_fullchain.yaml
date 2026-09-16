@@ -1,0 +1,36 @@
+include: configs/ogpo/robotwin_pick_dual_bottles_clean50_pytorch_divl_ogpo_ca_chipo_fullchain_g995.yaml
+
+# Stage 2: freeze the five-pair critic and expose all ten raw scalar Q heads
+# to CA+ChiPO.  Categorical V heads are not read by the clean actor path.
+critic:
+  ensemble_size: 5
+  expected_num_pairs: 5
+  expected_num_raw_q_heads: 10
+  double_q_divl: true
+  q_heads_per_member: 2
+  q_representation: scalar
+  categorical_q: false
+  enable_rankq: false
+  rankq: false
+  rank_consensus_enabled: false
+  bootstrap_probability: 1.0
+
+actor:
+  q_ensemble_source: raw_heads
+  q_ensemble_size: 10
+  q_correlation_log_period: 100
+  group_size: 4
+  candidate_group_size: 4
+  flash_enabled: false
+  temporal_rectification: false
+
+training:
+  resume_checkpoint: null
+  critic_checkpoint: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl_5pair_g995/critic_step_04000_final.pt
+  actor_start_step: 0
+  actor_steps: 2000
+  checkpoint_path: outputs/ogpo/robotwin_pick_dual_bottles_divl5_ogpo10q_ca_chipo_fullchain_final.pt
+  periodic_checkpoint_dir: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl5_ogpo10q_ca_chipo_fullchain
+  metrics_path: outputs/ogpo/robotwin_pick_dual_bottles_divl5_ogpo10q_ca_chipo_fullchain_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/robotwin_pick_dual_bottles_divl5_ogpo10q_ca_chipo_fullchain
+  config_snapshot_path: outputs/ogpo/checkpoints/robotwin_pick_dual_bottles_divl5_ogpo10q_ca_chipo_fullchain/resolved_config.yaml

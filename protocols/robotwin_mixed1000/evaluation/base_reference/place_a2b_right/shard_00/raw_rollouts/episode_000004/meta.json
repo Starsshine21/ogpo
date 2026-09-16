@@ -1,0 +1,18 @@
+{
+  "episode_index": 4,
+  "prompt": "Put the bright blue soap bar to the right of the medium-sized bell",
+  "success": false,
+  "num_frames": 0,
+  "num_environment_steps": 400,
+  "num_policy_chunks": 8,
+  "action_horizon": 50,
+  "action_dim": 14,
+  "transition_semantics": "evaluation metadata only",
+  "task_name": "place_a2b_right",
+  "task_config": "demo_clean",
+  "train_config": "pi05_robotwin2_clean50_full",
+  "model_name": "model_clean50",
+  "seed": 9200005,
+  "policy_noise_seed": 202609127004,
+  "ogpo_checkpoint": null
+}

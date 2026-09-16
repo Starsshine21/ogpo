@@ -1,0 +1,52 @@
+include: configs/ogpo/pi05_gemma_udivl_critic.yaml
+
+data:
+  dataset_path: outputs/ogpo/click_mouse_pi05_replay_100ep_train.pt
+  validation_path: outputs/ogpo/click_mouse_pi05_replay_100ep_validation.pt
+  language: "Move the mouse to the purple mouse pad and click the left mouse button."
+  gamma: 0.9999
+
+critic:
+  stage: full_td
+  q_loss: mse
+  optimizer: adam
+  learning_rate: 0.0005
+  weight_decay: 0.0
+  lr_schedule: cosine
+  min_lr_ratio: 0.0
+  target_tau: 0.005
+  bootstrap_target: ensemble_mean
+  reference_value_samples: 0
+  lambda_divl_target: 1.0
+  lambda_mc: 0.0
+  backbone:
+    learning_rate: 0.0005
+    train_siglip: true
+    train_vlm_full: true
+    gradient_checkpointing: true
+  gemma_lora:
+    final_n_layers: 0
+
+divl:
+  num_atoms: 201
+  auto_support: false
+  v_min: -0.1
+  v_max: 1.1
+  alpha_min: 0.5
+  alpha_max: 0.6
+  entropy_temperature: 0.3
+  alpha_mode: lwd_linear
+  interpolate_quantile: false
+
+training:
+  critic_steps: 15000
+  batch_size: 8
+  checkpoint_path: outputs/ogpo/click_mouse_gemma_udivl_100ep.pt
+  metrics_path: outputs/ogpo/click_mouse_gemma_udivl_100ep_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/click_mouse_gemma_udivl_100ep
+  early_stopping:
+    enabled: false
+
+evaluation:
+  interval: 100
+  validation_batch_size: 32

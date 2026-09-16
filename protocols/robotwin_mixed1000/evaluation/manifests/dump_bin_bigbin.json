@@ -1,0 +1,921 @@
+{
+  "version": 1,
+  "task_name": "dump_bin_bigbin",
+  "source_root": "<EVO_RL_ROOT>/dexjoco/outputs/robotwin_rollouts/guess/dump_bin_bigbin",
+  "source_episode_selection": "first sorted source episodes",
+  "episode_count": 100,
+  "num_eval_shards": 8,
+  "eval_shard_counts": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    9
+  ],
+  "noise_protocol": "numpy.PCG64 SeedSequence([policy_noise_seed, policy_chunk_id]); standard_normal([50, model_action_dim], float32)",
+  "episodes": [
+    {
+      "shard": 0,
+      "episode_index": 0,
+      "seed": 8000004,
+      "prompt": "Pick up the tabletrashbin made of plastic, pour balls into the bin.",
+      "policy_noise_seed": 202609123000,
+      "source_shard": 0,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 0,
+      "episode_index": 1,
+      "seed": 8000005,
+      "prompt": "Pour the plastic tiny trashbin for tables into the big bin.",
+      "policy_noise_seed": 202609123001,
+      "source_shard": 0,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 0,
+      "episode_index": 2,
+      "seed": 8000010,
+      "prompt": "Pour the plastic tiny trashbin for tables into the big bin.",
+      "policy_noise_seed": 202609123002,
+      "source_shard": 0,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 0,
+      "episode_index": 3,
+      "seed": 8000013,
+      "prompt": "Take the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123003,
+      "source_shard": 0,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 0,
+      "episode_index": 4,
+      "seed": 8000016,
+      "prompt": "Pick up the plastic tiny trashbin for tables, pour balls into the bin.",
+      "policy_noise_seed": 202609123004,
+      "source_shard": 0,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 0,
+      "episode_index": 5,
+      "seed": 8000017,
+      "prompt": "Take the small bin for table waste and empty into big bin",
+      "policy_noise_seed": 202609123005,
+      "source_shard": 0,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 0,
+      "episode_index": 6,
+      "seed": 8000018,
+      "prompt": "Pour the little tabletrashbin with smooth texture into the big bin.",
+      "policy_noise_seed": 202609123006,
+      "source_shard": 0,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 0,
+      "episode_index": 7,
+      "seed": 8000020,
+      "prompt": "Lift the plastic tiny trashbin for tables and empty it.",
+      "policy_noise_seed": 202609123007,
+      "source_shard": 0,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 0,
+      "episode_index": 8,
+      "seed": 8000024,
+      "prompt": "Grab the plastic tiny trashbin for tables and pour the balls.",
+      "policy_noise_seed": 202609123008,
+      "source_shard": 0,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 0,
+      "episode_index": 9,
+      "seed": 8000027,
+      "prompt": "Lift the tabletrashbin for tabletop use and empty it.",
+      "policy_noise_seed": 202609123009,
+      "source_shard": 0,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 0,
+      "episode_index": 10,
+      "seed": 8000028,
+      "prompt": "Lift the tabletrashbin made of plastic and transfer the contents.",
+      "policy_noise_seed": 202609123010,
+      "source_shard": 0,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 0,
+      "episode_index": 11,
+      "seed": 8000029,
+      "prompt": "Take the tabletrashbin made of plastic and empty it.",
+      "policy_noise_seed": 202609123011,
+      "source_shard": 0,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 0,
+      "episode_index": 12,
+      "seed": 8000030,
+      "prompt": "Lift the little tabletrashbin with smooth texture and empty it.",
+      "policy_noise_seed": 202609123012,
+      "source_shard": 0,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 1,
+      "episode_index": 0,
+      "seed": 8000032,
+      "prompt": "Pour the compact tabletop trashbin into the big bin.",
+      "policy_noise_seed": 202609123013,
+      "source_shard": 0,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 1,
+      "episode_index": 1,
+      "seed": 8000033,
+      "prompt": "Grab the lightweight round tabletop trashbin and pour balls.",
+      "policy_noise_seed": 202609123014,
+      "source_shard": 0,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 1,
+      "episode_index": 2,
+      "seed": 8000034,
+      "prompt": "Grab the desktop tabletrashbin for small trash and pour the balls.",
+      "policy_noise_seed": 202609123015,
+      "source_shard": 0,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 1,
+      "episode_index": 3,
+      "seed": 8000035,
+      "prompt": "Lift the tabletrashbin for holding small trash and empty it.",
+      "policy_noise_seed": 202609123016,
+      "source_shard": 0,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 1,
+      "episode_index": 4,
+      "seed": 8000041,
+      "prompt": "Lift the small bin for table waste and transfer the contents.",
+      "policy_noise_seed": 202609123017,
+      "source_shard": 0,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 1,
+      "episode_index": 5,
+      "seed": 8000043,
+      "prompt": "Grab the smooth plastic tabletrashbin and pour balls.",
+      "policy_noise_seed": 202609123018,
+      "source_shard": 0,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 1,
+      "episode_index": 6,
+      "seed": 8000044,
+      "prompt": "Lift the small bin for table waste and transfer the contents.",
+      "policy_noise_seed": 202609123019,
+      "source_shard": 0,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 1,
+      "episode_index": 7,
+      "seed": 8000047,
+      "prompt": "Pour the desktop tabletrashbin for small trash into the big bin.",
+      "policy_noise_seed": 202609123020,
+      "source_shard": 0,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 1,
+      "episode_index": 8,
+      "seed": 8000049,
+      "prompt": "Take the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123021,
+      "source_shard": 0,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 1,
+      "episode_index": 9,
+      "seed": 8000052,
+      "prompt": "Pick up the small bin for table waste, pour balls into the bin.",
+      "policy_noise_seed": 202609123022,
+      "source_shard": 0,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 1,
+      "episode_index": 10,
+      "seed": 8000055,
+      "prompt": "Lift the small smooth gray trashbin and empty it.",
+      "policy_noise_seed": 202609123023,
+      "source_shard": 0,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 1,
+      "episode_index": 11,
+      "seed": 8000057,
+      "prompt": "Lift the small bin for table waste and transfer the contents.",
+      "policy_noise_seed": 202609123024,
+      "source_shard": 0,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 1,
+      "episode_index": 12,
+      "seed": 8000060,
+      "prompt": "Pour the small bin for table waste into the big bin.",
+      "policy_noise_seed": 202609123025,
+      "source_shard": 0,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 2,
+      "episode_index": 0,
+      "seed": 8000065,
+      "prompt": "Lift the plastic tiny trashbin for tables and transfer the contents.",
+      "policy_noise_seed": 202609123026,
+      "source_shard": 0,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 2,
+      "episode_index": 1,
+      "seed": 8000075,
+      "prompt": "Take the plastic tiny trashbin for tables and empty it.",
+      "policy_noise_seed": 202609123027,
+      "source_shard": 0,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 2,
+      "episode_index": 2,
+      "seed": 8000077,
+      "prompt": "Pick up the plastic tiny trashbin for tables, pour balls into the bin.",
+      "policy_noise_seed": 202609123028,
+      "source_shard": 0,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 2,
+      "episode_index": 3,
+      "seed": 8000079,
+      "prompt": "Grab the tabletrashbin made of plastic and pour into big bin",
+      "policy_noise_seed": 202609123029,
+      "source_shard": 0,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 2,
+      "episode_index": 4,
+      "seed": 8000080,
+      "prompt": "Lift the small bin for table waste and empty it.",
+      "policy_noise_seed": 202609123030,
+      "source_shard": 0,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 2,
+      "episode_index": 5,
+      "seed": 8000082,
+      "prompt": "Grab the tabletrashbin for holding small trash and pour balls.",
+      "policy_noise_seed": 202609123031,
+      "source_shard": 0,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 2,
+      "episode_index": 6,
+      "seed": 8000084,
+      "prompt": "Take the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123032,
+      "source_shard": 0,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 2,
+      "episode_index": 7,
+      "seed": 8000086,
+      "prompt": "Grab the rectangular plastic bin and pour balls.",
+      "policy_noise_seed": 202609123033,
+      "source_shard": 0,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 2,
+      "episode_index": 8,
+      "seed": 8000087,
+      "prompt": "Lift the lightweight round tabletop trashbin and transfer the contents.",
+      "policy_noise_seed": 202609123034,
+      "source_shard": 0,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 2,
+      "episode_index": 9,
+      "seed": 8000088,
+      "prompt": "Grab the smooth plastic tabletrashbin and pour the balls.",
+      "policy_noise_seed": 202609123035,
+      "source_shard": 0,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 2,
+      "episode_index": 10,
+      "seed": 8000097,
+      "prompt": "Grab the gray trashbin for tabletop and pour into big bin",
+      "policy_noise_seed": 202609123036,
+      "source_shard": 0,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 2,
+      "episode_index": 11,
+      "seed": 8000100,
+      "prompt": "Lift the little tabletrashbin with smooth texture and transfer the contents.",
+      "policy_noise_seed": 202609123037,
+      "source_shard": 0,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 2,
+      "episode_index": 12,
+      "seed": 8000106,
+      "prompt": "Pick up the small bin for table waste and pour it.",
+      "policy_noise_seed": 202609123038,
+      "source_shard": 0,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 3,
+      "episode_index": 0,
+      "seed": 8000109,
+      "prompt": "Lift the plastic tiny trashbin for tables and empty it.",
+      "policy_noise_seed": 202609123039,
+      "source_shard": 0,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 3,
+      "episode_index": 1,
+      "seed": 8000111,
+      "prompt": "Grab the compact tabletop trashbin and pour into big bin",
+      "policy_noise_seed": 202609123040,
+      "source_shard": 0,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 3,
+      "episode_index": 2,
+      "seed": 8000113,
+      "prompt": "Take the tabletrashbin for tabletop use and empty it.",
+      "policy_noise_seed": 202609123041,
+      "source_shard": 0,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 3,
+      "episode_index": 3,
+      "seed": 8000121,
+      "prompt": "Grab the small bin for table waste and pour the balls.",
+      "policy_noise_seed": 202609123042,
+      "source_shard": 0,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 3,
+      "episode_index": 4,
+      "seed": 8000125,
+      "prompt": "Take the desktop tabletrashbin for small trash and empty it.",
+      "policy_noise_seed": 202609123043,
+      "source_shard": 0,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 3,
+      "episode_index": 5,
+      "seed": 8000128,
+      "prompt": "Lift the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123044,
+      "source_shard": 0,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 3,
+      "episode_index": 6,
+      "seed": 8000130,
+      "prompt": "Grab the small bin for table waste and pour the balls.",
+      "policy_noise_seed": 202609123045,
+      "source_shard": 0,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 3,
+      "episode_index": 7,
+      "seed": 8000132,
+      "prompt": "Pick up the small bin for table waste and pour it.",
+      "policy_noise_seed": 202609123046,
+      "source_shard": 0,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 3,
+      "episode_index": 8,
+      "seed": 8000133,
+      "prompt": "Take the small bin for table waste and empty it.",
+      "policy_noise_seed": 202609123047,
+      "source_shard": 0,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 3,
+      "episode_index": 9,
+      "seed": 8000136,
+      "prompt": "Pour the desktop tabletrashbin for small trash into the big bin.",
+      "policy_noise_seed": 202609123048,
+      "source_shard": 0,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 3,
+      "episode_index": 10,
+      "seed": 8000142,
+      "prompt": "Pour the small bin for table waste into the big bin.",
+      "policy_noise_seed": 202609123049,
+      "source_shard": 0,
+      "source_episode_index": 49
+    },
+    {
+      "shard": 3,
+      "episode_index": 11,
+      "seed": 8100000,
+      "prompt": "Take the plastic tiny trashbin for tables and empty it.",
+      "policy_noise_seed": 202609123050,
+      "source_shard": 1,
+      "source_episode_index": 0
+    },
+    {
+      "shard": 3,
+      "episode_index": 12,
+      "seed": 8100004,
+      "prompt": "Lift the plastic tiny trashbin for tables and empty it.",
+      "policy_noise_seed": 202609123051,
+      "source_shard": 1,
+      "source_episode_index": 1
+    },
+    {
+      "shard": 4,
+      "episode_index": 0,
+      "seed": 8100011,
+      "prompt": "Grab the rectangular light gray trash bin and pour the balls.",
+      "policy_noise_seed": 202609123052,
+      "source_shard": 1,
+      "source_episode_index": 2
+    },
+    {
+      "shard": 4,
+      "episode_index": 1,
+      "seed": 8100013,
+      "prompt": "Grab the little tabletrashbin with smooth texture and pour the balls.",
+      "policy_noise_seed": 202609123053,
+      "source_shard": 1,
+      "source_episode_index": 3
+    },
+    {
+      "shard": 4,
+      "episode_index": 2,
+      "seed": 8100014,
+      "prompt": "Lift the compact tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123054,
+      "source_shard": 1,
+      "source_episode_index": 4
+    },
+    {
+      "shard": 4,
+      "episode_index": 3,
+      "seed": 8100017,
+      "prompt": "Pick up the gray trashbin for tabletop, pour balls into the bin.",
+      "policy_noise_seed": 202609123055,
+      "source_shard": 1,
+      "source_episode_index": 5
+    },
+    {
+      "shard": 4,
+      "episode_index": 4,
+      "seed": 8100018,
+      "prompt": "Lift the small bin for table waste and transfer the contents.",
+      "policy_noise_seed": 202609123056,
+      "source_shard": 1,
+      "source_episode_index": 6
+    },
+    {
+      "shard": 4,
+      "episode_index": 5,
+      "seed": 8100022,
+      "prompt": "Pick up the plastic tiny trashbin for tables and pour it.",
+      "policy_noise_seed": 202609123057,
+      "source_shard": 1,
+      "source_episode_index": 7
+    },
+    {
+      "shard": 4,
+      "episode_index": 6,
+      "seed": 8100023,
+      "prompt": "Lift the rectangular light gray trash bin and empty it.",
+      "policy_noise_seed": 202609123058,
+      "source_shard": 1,
+      "source_episode_index": 8
+    },
+    {
+      "shard": 4,
+      "episode_index": 7,
+      "seed": 8100024,
+      "prompt": "Take the rectangular plastic bin and empty into big bin",
+      "policy_noise_seed": 202609123059,
+      "source_shard": 1,
+      "source_episode_index": 9
+    },
+    {
+      "shard": 4,
+      "episode_index": 8,
+      "seed": 8100031,
+      "prompt": "Lift the lightweight round tabletop trashbin and transfer the contents.",
+      "policy_noise_seed": 202609123060,
+      "source_shard": 1,
+      "source_episode_index": 10
+    },
+    {
+      "shard": 4,
+      "episode_index": 9,
+      "seed": 8100032,
+      "prompt": "Grab the compact tabletop trashbin and pour the balls.",
+      "policy_noise_seed": 202609123061,
+      "source_shard": 1,
+      "source_episode_index": 11
+    },
+    {
+      "shard": 4,
+      "episode_index": 10,
+      "seed": 8100038,
+      "prompt": "Grab the small smooth gray trashbin and pour balls.",
+      "policy_noise_seed": 202609123062,
+      "source_shard": 1,
+      "source_episode_index": 12
+    },
+    {
+      "shard": 4,
+      "episode_index": 11,
+      "seed": 8100040,
+      "prompt": "Grab the small bin for table waste and pour the balls.",
+      "policy_noise_seed": 202609123063,
+      "source_shard": 1,
+      "source_episode_index": 13
+    },
+    {
+      "shard": 4,
+      "episode_index": 12,
+      "seed": 8100043,
+      "prompt": "Pick up the tabletrashbin for holding small trash, pour balls into the bin.",
+      "policy_noise_seed": 202609123064,
+      "source_shard": 1,
+      "source_episode_index": 14
+    },
+    {
+      "shard": 5,
+      "episode_index": 0,
+      "seed": 8100045,
+      "prompt": "Grab the gray trashbin for tabletop and pour into big bin",
+      "policy_noise_seed": 202609123065,
+      "source_shard": 1,
+      "source_episode_index": 15
+    },
+    {
+      "shard": 5,
+      "episode_index": 1,
+      "seed": 8100049,
+      "prompt": "Grab the small smooth gray trashbin and pour into big bin",
+      "policy_noise_seed": 202609123066,
+      "source_shard": 1,
+      "source_episode_index": 16
+    },
+    {
+      "shard": 5,
+      "episode_index": 2,
+      "seed": 8100051,
+      "prompt": "Grab the tabletrashbin made of plastic and pour the balls.",
+      "policy_noise_seed": 202609123067,
+      "source_shard": 1,
+      "source_episode_index": 17
+    },
+    {
+      "shard": 5,
+      "episode_index": 3,
+      "seed": 8100052,
+      "prompt": "Pick up the little tabletrashbin with smooth texture, pour balls into the bin.",
+      "policy_noise_seed": 202609123068,
+      "source_shard": 1,
+      "source_episode_index": 18
+    },
+    {
+      "shard": 5,
+      "episode_index": 4,
+      "seed": 8100054,
+      "prompt": "Pick up the lightweight round tabletop trashbin, pour balls into the bin.",
+      "policy_noise_seed": 202609123069,
+      "source_shard": 1,
+      "source_episode_index": 19
+    },
+    {
+      "shard": 5,
+      "episode_index": 5,
+      "seed": 8100057,
+      "prompt": "Pour the small smooth gray trashbin into the big bin.",
+      "policy_noise_seed": 202609123070,
+      "source_shard": 1,
+      "source_episode_index": 20
+    },
+    {
+      "shard": 5,
+      "episode_index": 6,
+      "seed": 8100058,
+      "prompt": "Lift the desktop tabletrashbin for small trash and transfer the contents.",
+      "policy_noise_seed": 202609123071,
+      "source_shard": 1,
+      "source_episode_index": 21
+    },
+    {
+      "shard": 5,
+      "episode_index": 7,
+      "seed": 8100060,
+      "prompt": "Grab the tabletrashbin for tabletop use and pour into big bin",
+      "policy_noise_seed": 202609123072,
+      "source_shard": 1,
+      "source_episode_index": 22
+    },
+    {
+      "shard": 5,
+      "episode_index": 8,
+      "seed": 8100063,
+      "prompt": "Grab the small bin for table waste and pour into big bin",
+      "policy_noise_seed": 202609123073,
+      "source_shard": 1,
+      "source_episode_index": 23
+    },
+    {
+      "shard": 5,
+      "episode_index": 9,
+      "seed": 8100064,
+      "prompt": "Pick up the lightweight round tabletop trashbin and pour it.",
+      "policy_noise_seed": 202609123074,
+      "source_shard": 1,
+      "source_episode_index": 24
+    },
+    {
+      "shard": 5,
+      "episode_index": 10,
+      "seed": 8100070,
+      "prompt": "Grab the plastic tiny trashbin for tables and pour balls.",
+      "policy_noise_seed": 202609123075,
+      "source_shard": 1,
+      "source_episode_index": 25
+    },
+    {
+      "shard": 5,
+      "episode_index": 11,
+      "seed": 8100072,
+      "prompt": "Pour the desktop tabletrashbin for small trash into the big bin.",
+      "policy_noise_seed": 202609123076,
+      "source_shard": 1,
+      "source_episode_index": 26
+    },
+    {
+      "shard": 5,
+      "episode_index": 12,
+      "seed": 8100082,
+      "prompt": "Lift the tabletrashbin for tabletop use and empty it.",
+      "policy_noise_seed": 202609123077,
+      "source_shard": 1,
+      "source_episode_index": 27
+    },
+    {
+      "shard": 6,
+      "episode_index": 0,
+      "seed": 8100085,
+      "prompt": "Take the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123078,
+      "source_shard": 1,
+      "source_episode_index": 28
+    },
+    {
+      "shard": 6,
+      "episode_index": 1,
+      "seed": 8100087,
+      "prompt": "Lift the smooth plastic tabletrashbin and transfer the contents.",
+      "policy_noise_seed": 202609123079,
+      "source_shard": 1,
+      "source_episode_index": 29
+    },
+    {
+      "shard": 6,
+      "episode_index": 2,
+      "seed": 8100097,
+      "prompt": "Take the lightweight round tabletop trashbin and empty into big bin",
+      "policy_noise_seed": 202609123080,
+      "source_shard": 1,
+      "source_episode_index": 30
+    },
+    {
+      "shard": 6,
+      "episode_index": 3,
+      "seed": 8100106,
+      "prompt": "Pour the lightweight round tabletop trashbin into the big bin.",
+      "policy_noise_seed": 202609123081,
+      "source_shard": 1,
+      "source_episode_index": 31
+    },
+    {
+      "shard": 6,
+      "episode_index": 4,
+      "seed": 8100107,
+      "prompt": "Grab the lightweight round tabletop trashbin and pour into big bin",
+      "policy_noise_seed": 202609123082,
+      "source_shard": 1,
+      "source_episode_index": 32
+    },
+    {
+      "shard": 6,
+      "episode_index": 5,
+      "seed": 8100114,
+      "prompt": "Grab the desktop tabletrashbin for small trash and pour balls.",
+      "policy_noise_seed": 202609123083,
+      "source_shard": 1,
+      "source_episode_index": 33
+    },
+    {
+      "shard": 6,
+      "episode_index": 6,
+      "seed": 8100117,
+      "prompt": "Pour the lightweight round tabletop trashbin into the big bin.",
+      "policy_noise_seed": 202609123084,
+      "source_shard": 1,
+      "source_episode_index": 34
+    },
+    {
+      "shard": 6,
+      "episode_index": 7,
+      "seed": 8100118,
+      "prompt": "Lift the rectangular light gray trash bin and empty it.",
+      "policy_noise_seed": 202609123085,
+      "source_shard": 1,
+      "source_episode_index": 35
+    },
+    {
+      "shard": 6,
+      "episode_index": 8,
+      "seed": 8100121,
+      "prompt": "Take the lightweight round tabletop trashbin and empty it.",
+      "policy_noise_seed": 202609123086,
+      "source_shard": 1,
+      "source_episode_index": 36
+    },
+    {
+      "shard": 6,
+      "episode_index": 9,
+      "seed": 8100127,
+      "prompt": "Take the smooth plastic tabletrashbin and empty it.",
+      "policy_noise_seed": 202609123087,
+      "source_shard": 1,
+      "source_episode_index": 37
+    },
+    {
+      "shard": 6,
+      "episode_index": 10,
+      "seed": 8100128,
+      "prompt": "Pour the rectangular light gray trash bin into the big bin.",
+      "policy_noise_seed": 202609123088,
+      "source_shard": 1,
+      "source_episode_index": 38
+    },
+    {
+      "shard": 6,
+      "episode_index": 11,
+      "seed": 8100129,
+      "prompt": "Lift the plastic tiny trashbin for tables and transfer the contents.",
+      "policy_noise_seed": 202609123089,
+      "source_shard": 1,
+      "source_episode_index": 39
+    },
+    {
+      "shard": 6,
+      "episode_index": 12,
+      "seed": 8100130,
+      "prompt": "Pick up the small bin for table waste and pour it.",
+      "policy_noise_seed": 202609123090,
+      "source_shard": 1,
+      "source_episode_index": 40
+    },
+    {
+      "shard": 7,
+      "episode_index": 0,
+      "seed": 8100131,
+      "prompt": "Grab the small bin for table waste and pour into big bin",
+      "policy_noise_seed": 202609123091,
+      "source_shard": 1,
+      "source_episode_index": 41
+    },
+    {
+      "shard": 7,
+      "episode_index": 1,
+      "seed": 8100132,
+      "prompt": "Pick up the portable gray speckled tabletrashbin, pour balls into the bin.",
+      "policy_noise_seed": 202609123092,
+      "source_shard": 1,
+      "source_episode_index": 42
+    },
+    {
+      "shard": 7,
+      "episode_index": 2,
+      "seed": 8100134,
+      "prompt": "Grab the compact tabletop trashbin and pour into big bin",
+      "policy_noise_seed": 202609123093,
+      "source_shard": 1,
+      "source_episode_index": 43
+    },
+    {
+      "shard": 7,
+      "episode_index": 3,
+      "seed": 8100137,
+      "prompt": "Pick up the smooth plastic tabletrashbin and pour it.",
+      "policy_noise_seed": 202609123094,
+      "source_shard": 1,
+      "source_episode_index": 44
+    },
+    {
+      "shard": 7,
+      "episode_index": 4,
+      "seed": 8100142,
+      "prompt": "Lift the plastic tiny trashbin for tables and transfer the contents.",
+      "policy_noise_seed": 202609123095,
+      "source_shard": 1,
+      "source_episode_index": 45
+    },
+    {
+      "shard": 7,
+      "episode_index": 5,
+      "seed": 8100144,
+      "prompt": "Take the small smooth gray trashbin and empty it.",
+      "policy_noise_seed": 202609123096,
+      "source_shard": 1,
+      "source_episode_index": 46
+    },
+    {
+      "shard": 7,
+      "episode_index": 6,
+      "seed": 8100148,
+      "prompt": "Pick up the desktop tabletrashbin for small trash, pour balls into the bin.",
+      "policy_noise_seed": 202609123097,
+      "source_shard": 1,
+      "source_episode_index": 47
+    },
+    {
+      "shard": 7,
+      "episode_index": 7,
+      "seed": 8100149,
+      "prompt": "Lift the tabletrashbin made of plastic and transfer the contents.",
+      "policy_noise_seed": 202609123098,
+      "source_shard": 1,
+      "source_episode_index": 48
+    },
+    {
+      "shard": 7,
+      "episode_index": 8,
+      "seed": 8100150,
+      "prompt": "Grab the portable gray speckled tabletrashbin and pour the balls.",
+      "policy_noise_seed": 202609123099,
+      "source_shard": 1,
+      "source_episode_index": 49
+    }
+  ]
+}

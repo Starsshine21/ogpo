@@ -1,0 +1,14 @@
+include: configs/ogpo/robotwin_mixed1000_bootstrap_catq_20k.yaml
+training:
+  resume_checkpoint: null
+  initial_critic_checkpoint: null
+  batch_size: 32
+  critic_sampling:
+    mode: shared_episode_bootstrap
+  checkpoint_path: outputs/ogpo/checkpoints/robotwin_mixed1000_bootstrap_catq_shared32_20k/critic_step_20000_final.pt
+  latest_checkpoint_path: outputs/ogpo/checkpoints/robotwin_mixed1000_bootstrap_catq_shared32_20k/latest.pt
+  milestone_checkpoint_dir: outputs/ogpo/checkpoints/robotwin_mixed1000_bootstrap_catq_shared32_20k/milestones
+  metrics_path: outputs/ogpo/robotwin_mixed1000_bootstrap_catq_shared32_20k_metrics.jsonl
+  tensorboard_dir: outputs/ogpo/tensorboard/robotwin_mixed1000_bootstrap_catq_shared32_20k
+  config_snapshot_path: outputs/ogpo/checkpoints/robotwin_mixed1000_bootstrap_catq_shared32_20k/resolved_config.yaml
+  parameter_summary_path: outputs/ogpo/checkpoints/robotwin_mixed1000_bootstrap_catq_shared32_20k/parameter_summary.json
