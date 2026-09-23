@@ -62,6 +62,20 @@ def test_pi05_adapter_uses_real_backend_shape_and_repeats_condition_groups():
     assert not backend.scale.requires_grad
 
 
+def test_pi05_adapter_can_use_full_model_flow_dimension_while_returning_environment_actions():
+    backend = FakePI05Backend(action_horizon=3, action_dim=4)
+    policy = PI05PytorchFlowPolicy(
+        backend,
+        environment_action_dim=2,
+        flow_action_dim="model",
+        num_steps=2,
+        residual_hidden_dim=16,
+    )
+    rollout = policy.rollout(_condition(2), group_size=3)
+    assert rollout.endpoint.shape == (6, 3 * 4)
+    assert backend.seen_shape == (6, 3, 4)
+
+
 def test_pi05_adapter_clone_starts_with_unit_ratio_and_only_trains_residual():
     backend = FakePI05Backend(action_horizon=3, action_dim=4)
     policy = PI05PytorchFlowPolicy(
@@ -320,6 +334,36 @@ def test_replay_action_normalization_roundtrips_through_checkpoint_transforms():
     restored = builder.flat_actions_to_environment(normalized.reshape(3, -1))
 
     assert torch.allclose(normalized, batch.action_chunks * 2.0)
+    assert torch.allclose(restored.reshape_as(batch.action_chunks), batch.action_chunks)
+
+
+def test_replay_actions_pad_to_model_flow_dimension_and_restore_environment_actions():
+    batch = make_synthetic_replay(num_samples=2, generated_horizon=3, action_dim=2)
+    images = {"front": torch.zeros(2, 2, 2, 3, dtype=torch.uint8)}
+    batch = dataclass_replace(batch, images=images, next_images=images)
+
+    def input_transform(raw):
+        result = {"state": raw["state"], "image": {"base": raw["base"]}}
+        if "actions" in raw:
+            result["actions"] = raw["actions"] * 2.0
+        return result
+
+    def output_transform(data):
+        return {"actions": data["actions"][:, :2] / 2.0}
+
+    builder = PI05ReplayConditionBuilder(
+        input_transform=input_transform,
+        output_transform=output_transform,
+        observation_type=FakeObservation,
+        image_mapping={"base": "front"},
+        model_action_dim=4,
+        environment_action_dim=2,
+        flow_action_dim=4,
+    )
+    normalized = builder.action_chunks_to_flow(batch)
+    restored = builder.flat_actions_to_environment(normalized.reshape(2, -1))
+    assert normalized.shape == (2, 3, 4)
+    assert torch.count_nonzero(normalized[..., 2:]) == 0
     assert torch.allclose(restored.reshape_as(batch.action_chunks), batch.action_chunks)
 
 

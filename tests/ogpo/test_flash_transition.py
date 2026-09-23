@@ -1,4 +1,5 @@
 import torch
+import pytest
 
 from ogpo.flash_ogpo import sample_flash_rollout
 from ogpo.openpi_flow_spec import OpenPIStochasticFlowPolicy
@@ -47,3 +48,29 @@ def test_stratified_flash_steps_cover_the_schedule():
     )
 
     assert torch.equal(torch.sort(selected).values, torch.arange(8))
+
+
+def test_constant_corrected_flash_never_selects_deterministic_final_step():
+    config = {
+        "selected_timestep_distribution": "uniform",
+        "sde_mode": "ogpo_constant_corrected",
+    }
+    selected = _select_flash_steps(
+        config, batch_size=2048, num_steps=10,
+        device=torch.device("cpu"), seed=17,
+    )
+    assert int(selected.min()) == 0
+    assert int(selected.max()) == 8
+    assert not bool((selected == 9).any())
+
+
+def test_constant_corrected_flash_rejects_fixed_deterministic_final_step():
+    with pytest.raises(ValueError, match="stochastic transition"):
+        _select_flash_steps(
+            {
+                "selected_timestep_distribution": "fixed",
+                "selected_timestep": 9,
+                "sde_mode": "ogpo_constant_corrected",
+            },
+            batch_size=2, num_steps=10, device=torch.device("cpu"), seed=17,
+        )

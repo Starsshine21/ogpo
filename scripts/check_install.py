@@ -38,10 +38,10 @@ def main() -> None:
             print(f"{module_name}=ok ({version})")
 
     for relative in (
-        "configs/ogpo/critic_udivl.yaml",
-        "configs/ogpo/robotwin_mixed1000_bootstrap_catq_shared32_20k.yaml",
-        "configs/ogpo/robotwin_mixed1000_catq9k_actor_2k.yaml",
-        "protocols/robotwin_mixed1000/evaluation/protocol.json",
+        "configs/ogpo/threecam_scalar_guarded.yaml",
+        "configs/ogpo/threecam_scalar_norank.yaml",
+        "configs/ogpo/threecam_scalar_tau1.yaml",
+        "configs/ogpo/threecam_flash_actor.yaml",
     ):
         path = ROOT / relative
         if not path.is_file():
@@ -57,4 +57,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

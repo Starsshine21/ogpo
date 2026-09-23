@@ -105,6 +105,7 @@ from .rankq import (
     make_same_state_rankq_actions,
     make_rankq_actions,
     same_state_rankq_settings,
+    full_rankq_settings,
 )
 from .pi05_pytorch_adapter import PI05FlowCondition, PI05PytorchFlowPolicy, load_pi05_pytorch_flow_policy
 from .temporal_rectification import EmpiricalGradientRectifier, analytic_rectification
@@ -780,6 +781,7 @@ def build_train_state(
             image_container_key=flow_cfg.get("image_container_key"),
             transpose_images_to_chw=bool(flow_cfg.get("transpose_images_to_chw", False)),
             environment_action_dim=batch.action_dim,
+            flow_action_dim=flow_cfg.get("latent_action_dim"),
             num_steps=int(flow_cfg.get("num_steps", 10)),
             stochastic_variance=float(flow_cfg.get("stochastic_variance", 0.04)),
             sde_mode=str(flow_cfg.get("sde_mode", "gaussian_adapter")),
@@ -822,6 +824,9 @@ def build_train_state(
                 flow_policy_kwargs["device"] = resolved_role_devices["current"]
             flow_policy_kwargs["backend_train_mode"] = str(
                 flow_cfg.get("backend_train_mode", "none")
+            )
+            flow_policy_kwargs["frozen_prefix_cache"] = bool(
+                flow_cfg.get("frozen_prefix_cache", False)
             )
             flow_policy_kwargs["constant_noise_std"] = float(
                 flow_cfg.get("constant_noise_std", 0.005)
@@ -1495,6 +1500,10 @@ def _multimodal_double_q_divl_update(
     loss_scale: float = 1.0,
     same_state_rankq_actions: SameStateRankQActions | None = None,
     same_state_rankq_success_scale: float = 1.0,
+    full_rankq_actions: RankQActions | None = None,
+    full_rankq_mean_scales: dict[str, float] | None = None,
+    base_member_weights: torch.Tensor | None = None,
+    diagnostic_values: list | None = None,
     diagnostic_component_gradients: bool = False,
 ) -> dict[str, float]:
     """Train the clean three-member DIVL clipped-double-Q critic.
@@ -1530,13 +1539,45 @@ def _multimodal_double_q_divl_update(
         )
     q_clipped = q_pairs.min(dim=1).values
 
-    rankq_settings = same_state_rankq_settings(
+    rankq_settings = full_rankq_settings(
         critic_cfg, optimizer_step=state.step
     )
     nested_rankq_enabled = bool(rankq_settings["enabled"])
     if nested_rankq_enabled and bool(critic_cfg.get("enable_rankq", False)):
         raise ValueError("nested critic.rankq and legacy flat RankQ cannot both be enabled")
-    if nested_rankq_enabled:
+    if nested_rankq_enabled and rankq_settings["full"]:
+        if full_rankq_actions is None:
+            pool = core.action_pool
+            full_rankq_actions = make_rankq_actions(
+                batch.action_chunks, batch.execution_masks,
+                action_mean=pool.action_mean, action_std=pool.action_std,
+                action_min=pool.action_min, action_max=pool.action_max,
+                noise_sigma=rankq_settings["noise_sigma"], task_ids=batch.task_ids,
+                episode_ids=batch.episode_ids, timesteps=batch.timesteps)
+        full_rankq_actions = full_rankq_actions.to(batch.action_chunks.device)
+        variants = [(name, getattr(full_rankq_actions, name))
+                    for name in ("noisy", "very_noisy", "random", "permuted")]
+        variant_raw_q = state.critic.raw_q_ensemble_from_features(
+            StateFeatures(readout=features.readout.repeat(len(variants), 1)),
+            torch.cat([action for _, action in variants]), critic_mask.repeat(len(variants), 1)
+        ).reshape(core.num_q_heads, len(variants), batch.batch_size)
+        rankq_values = {"positive": q_pairs.reshape(core.num_q_heads, batch.batch_size),
+                        **{name: variant_raw_q[:, i] for i, (name, _) in enumerate(variants)}}
+        rankq_output = compute_rankq_loss(
+            rankq_values, batch.successes,
+            permuted_valid_mask=full_rankq_actions.permuted_valid_mask,
+            alpha_success=rankq_settings["alpha_success"], alpha_failure=rankq_settings["alpha_failure"],
+            use_random_negative=rankq_settings["use_random_negative"],
+            use_permuted_negative=rankq_settings["use_permuted_negative"],
+            mean_scales=full_rankq_mean_scales,
+            pair_loss=rankq_settings["pair_loss"],
+            temperature=rankq_settings["temperature"],
+            max_gap=rankq_settings["max_gap"])
+        rankq_loss = rankq_output.loss
+        rankq_metrics = {"rankq_enabled": 1.0, "rankq_lambda": rankq_settings["lambda_rank"],
+                         "lambda_rank": rankq_settings["lambda_rank"], "noise_sigma": rankq_settings["noise_sigma"],
+                         **rankq_output.metrics}
+    elif nested_rankq_enabled:
         if same_state_rankq_actions is None:
             action_pool = state.critic.core.action_pool
             same_state_rankq_actions = make_same_state_rankq_actions(
@@ -1597,9 +1638,9 @@ def _multimodal_double_q_divl_update(
         rankq_loss = q_pairs.detach().new_zeros(())
         rankq_metrics = disabled_same_state_rankq_metrics(
             lambda_rank=float(rankq_settings["lambda_rank"]),
-            logged_mild_weight=float(rankq_settings["logged_mild_weight"]),
-            mild_strong_weight=float(rankq_settings["mild_strong_weight"]),
-            strong_random_weight=float(rankq_settings["strong_random_weight"]),
+            logged_mild_weight=float(rankq_settings.get("logged_mild_weight", 1.0)),
+            mild_strong_weight=float(rankq_settings.get("mild_strong_weight", 1.0)),
+            strong_random_weight=float(rankq_settings.get("strong_random_weight", 1.0)),
         )
     rankq_metrics.update(
         {
@@ -1652,6 +1693,8 @@ def _multimodal_double_q_divl_update(
         target_pairs = state.target_critic.q_pair_from_features(
             target_features, batch.action_chunks, critic_mask
         )
+        if not bool(torch.isfinite(target_pairs).all()):
+            raise FloatingPointError("non-finite target raw Q")
         target_clipped = target_pairs.min(dim=1).values
         v_q_aggregation = str(critic_cfg.get("v_q_aggregation", "min")).lower()
         v_q_target = aggregate_double_q_for_v(target_pairs, v_q_aggregation)
@@ -1661,13 +1704,10 @@ def _multimodal_double_q_divl_update(
             aggregation=v_q_aggregation,
         )
 
-    mask = bootstrap_mask(
-        state.critic.ensemble_size,
-        batch.batch_size,
+    mask = (base_member_weights.to(q_pairs.device) > 0) if base_member_weights is not None else bootstrap_mask(
+        state.critic.ensemble_size, batch.batch_size,
         float(critic_cfg.get("bootstrap_probability", 1.0)),
-        device=q_pairs.device,
-        generator=state.target_generator,
-    )
+        device=q_pairs.device, generator=state.target_generator)
     if config.get("training", {}).get("critic_sampling", {}).get("mode") == "member_episode_bootstrap":
         from .episode_bootstrap import member_owner_loss_mask
         mask = member_owner_loss_mask(batch, state.critic.ensemble_size, device=q_pairs.device)
@@ -1684,16 +1724,13 @@ def _multimodal_double_q_divl_update(
         q_clip_low = (y < core.q_support[0]).float().mean()
         q_clip_high = (y > core.q_support[-1]).float().mean()
     else:
-        q_error = (q_pairs - y.unsqueeze(1)).square()
-        q_entropy = q_pairs.new_zeros(q_pairs.shape)
-        q_clip_low = q_pairs.new_zeros(())
-        q_clip_high = q_pairs.new_zeros(())
+        q_error = 0.5 * (q_pairs - y.unsqueeze(1)).square()
     weighted_mask = mask.to(q_error.dtype).unsqueeze(1)
     q_loss = (q_error * weighted_mask).sum() / weighted_mask.sum().clamp_min(1.0) / 2.0
     value_logits = state.critic.value_logits_from_features(features)
     value_ce = -(z_target * F.log_softmax(value_logits, dim=-1)).sum(dim=-1)
     divl_loss = (value_ce * mask.to(value_ce.dtype)).sum() / mask.sum().clamp_min(1.0)
-    if config.get("training", {}).get("critic_sampling", {}).get("mode") == "shared_episode_bootstrap":
+    if base_member_weights is None and config.get("training", {}).get("critic_sampling", {}).get("mode") == "shared_episode_bootstrap":
         from .episode_bootstrap import normalize_shared_member_weights
         if 'bootstrap_loss_weights' not in batch.behavior_metadata[0]:
             batch = normalize_shared_member_weights(batch, device=q_pairs.device)
@@ -1704,6 +1741,16 @@ def _multimodal_double_q_divl_update(
     divl_objective_loss = (
         q_loss + float(divl_cfg.get("loss_weight", 1.0)) * divl_loss
     )
+    if base_member_weights is not None:
+        weights = base_member_weights.to(q_error)
+        q_loss = (q_error * weights[:, None, :]).sum() / 2.0
+        divl_loss = (value_ce * weights).sum()
+        divl_objective_loss = q_loss + float(divl_cfg.get("loss_weight", 1.0)) * divl_loss
+    if not all(bool(torch.isfinite(value).all()) for value in (q_pairs, y, value_logits, divl_objective_loss, rankq_loss)):
+        raise FloatingPointError("non-finite Q/target/V/base/RankQ loss")
+    if diagnostic_values is not None:
+        diagnostic_values.append(({name: value.detach() for name, value in rankq_values.items()},
+                                  q_pairs.detach(), y.detach()))
     rankq_lambda = float(rankq_settings["lambda_rank"])
     rankq_weighted_loss = rankq_lambda * rankq_loss
     loss = (
@@ -1711,6 +1758,8 @@ def _multimodal_double_q_divl_update(
         if nested_rankq_enabled
         else divl_objective_loss
     )
+    if not bool(torch.isfinite(loss)):
+        raise FloatingPointError("non-finite total critic loss")
     if diagnostic_component_gradients:
         if not nested_rankq_enabled:
             raise ValueError("RankQ gradient diagnostic requires active critic.rankq")
@@ -1934,9 +1983,11 @@ def _multimodal_double_q_divl_update(
     if nested_rankq_enabled:
         backward_loss = (
             backward_loss
-            + float(same_state_rankq_success_scale) * rankq_weighted_loss
+            + (1.0 if rankq_settings["full"] else float(same_state_rankq_success_scale)) * rankq_weighted_loss
         )
     backward_loss.backward()
+    if any(p.grad is not None and not bool(torch.isfinite(p.grad).all()) for p in state.critic.parameters()):
+        raise FloatingPointError("non-finite critic gradient")
     critic_grad_norm = 0.0
     critic_grad_norm_postclip = 0.0
     critic_grad_clip_scale = 1.0
@@ -1945,7 +1996,7 @@ def _multimodal_double_q_divl_update(
         critic_grad_norm = float(grad_norm(state.critic.parameters()))
         max_grad_norm = float(critic_cfg.get("max_grad_norm", 10.0))
         torch.nn.utils.clip_grad_norm_(
-            state.critic.parameters(), max_grad_norm
+            state.critic.parameters(), max_grad_norm, error_if_nonfinite=True
         )
         critic_grad_norm_postclip = float(grad_norm(state.critic.parameters()))
         critic_grad_clip_scale = min(
@@ -1987,16 +2038,6 @@ def _multimodal_double_q_divl_update(
         "q_representation_is_categorical": float(
             core.q_representation == "categorical"
         ),
-        "critic/q_ce_loss": float(q_loss.detach().item())
-        if core.q_representation == "categorical"
-        else 0.0,
-        "critic/q_one_hot_ce_loss": float(q_loss.detach().item())
-        if core.q_representation == "categorical"
-        else 0.0,
-        "critic/q_expected_mse_loss": 0.0,
-        "critic/q_target_clip_low_fraction": float(q_clip_low.item()),
-        "critic/q_target_clip_high_fraction": float(q_clip_high.item()),
-        "critic/q_entropy_mean": float(q_entropy.mean().item()),
         "divl_loss": float(divl_loss.detach().item()),
         "v_loss": float(divl_loss.detach().item()),
         "divl_enabled": 1.0,
@@ -2057,6 +2098,17 @@ def _multimodal_double_q_divl_update(
     if core.num_q_heads == 10:
         metrics["raw_10q_mean"] = metrics["raw_q_mean"]
         metrics["raw_10q_std"] = metrics["raw_q_std"]
+    if core.q_representation == "categorical":
+        metrics.update({
+            "critic/q_ce_loss": float(q_loss.detach()),
+            "critic/q_one_hot_ce_loss": float(q_loss.detach()),
+            "critic/q_expected_mse_loss": 0.0,
+            "critic/q_target_clip_low_fraction": float(q_clip_low),
+            "critic/q_target_clip_high_fraction": float(q_clip_high),
+            "critic/q_entropy_mean": float(q_entropy.mean()),
+        })
+    metrics.update(scalar_q_scale_metrics(q_pairs.detach(), y.detach()))
+    metrics["v_distributional_saturation"] = metrics["categorical_saturation"]
     for member in range(core.num_pairs):
         metrics[f"q_loss_member_{member}"] = float(
             q_error.detach()[member].mean().item()
@@ -2628,7 +2680,7 @@ def critic_update(state: OGPOTrainState, batch: ChunkBatch, config: dict[str, An
             # stays on the original pure-DIVL path below (no perturbation or
             # auxiliary raw-Q forward).
             if bool(
-                same_state_rankq_settings(
+                full_rankq_settings(
                     config.get("critic", {}), optimizer_step=state.step
                 )["enabled"]
             ):
@@ -2770,6 +2822,153 @@ def critic_update(state: OGPOTrainState, batch: ChunkBatch, config: dict[str, An
     return metrics
 
 
+def scalar_q_scale_metrics(q_pairs: torch.Tensor, targets: torch.Tensor) -> dict[str, float]:
+    raw = q_pairs.float().flatten(0, 1)
+    absolute = raw.abs()
+    error = (q_pairs.float() - targets.float()[:, None, :]).abs()
+    centered = raw - raw.mean(1, keepdim=True)
+    norms = centered.square().sum(1).sqrt().clamp_min(1e-12)
+    correlation = centered @ centered.t() / (norms[:, None] * norms[None, :])
+    off = ~torch.eye(raw.shape[0], device=raw.device, dtype=torch.bool)
+    return {
+        "raw_q_min": float(raw.min()), "raw_q_max": float(raw.max()),
+        "raw_q_mean": float(raw.mean()), "raw_q_std": float(raw.std(unbiased=False)),
+        "raw_q_abs_mean": float(absolute.mean()), "raw_q_abs_p95": float(torch.quantile(absolute, .95)),
+        "raw_q_abs_max": float(absolute.max()), "target_mean": float(targets.mean()),
+        "target_std": float(targets.std(unbiased=False)), "target_min": float(targets.min()),
+        "target_max": float(targets.max()), "td_error_abs_mean": float(error.mean()),
+        "td_error_p90": float(torch.quantile(error, .9)),
+        "mean_pair_disagreement": float((q_pairs[:, 0] - q_pairs[:, 1]).abs().mean()),
+        "raw_q_ensemble_std": float(raw.std(0, unbiased=False).mean()),
+        "raw_q_pair_correlation": float(correlation[off].mean()),
+    }
+
+
+def _accumulated_full_rankq_update(state, batch, config, microbatch_size, settings):
+    """One global outcome mean per relation, independent of microbatch composition.
+
+    Gradients are manually SUM/world reduced by the existing update. Therefore
+    each microbatch mean receives world * micro_valid / global_valid, without
+    an additional microbatch-size multiplier. Full-batch bootstrap weights are
+    also resolved once, so TD/V accumulation has exactly the same objective.
+    """
+    if not isinstance(state.critic, MultiHeadUdivlCritic) or state.critic.core.q_heads_per_member != 2 or not config["critic"].get("double_q_divl"):
+        raise ValueError("full nested RankQ requires multihead double-Q DIVL")
+    device = next(state.critic.parameters()).device
+    batch = batch.to(device)
+    core = state.critic.core
+    pool = core.action_pool
+    world = dist.get_world_size() if dist.is_available() and dist.is_initialized() else 1
+    action_chunks, execution_masks = batch.action_chunks, batch.execution_masks
+    task_ids, episode_ids, timesteps = batch.task_ids, batch.episode_ids, batch.timesteps
+    offset = 0
+    if world > 1:
+        # A same-task donor may live on another rank. Gather only tiny action
+        # chunks/identity fields, never images/backbone features.
+        local = (action_chunks.cpu(), execution_masks.cpu(), list(task_ids), episode_ids.cpu(), timesteps.cpu())
+        parts = [None] * world
+        dist.all_gather_object(parts, local)
+        offset = sum(item[0].shape[0] for item in parts[:dist.get_rank()])
+        action_chunks = torch.cat([item[0] for item in parts]).to(device)
+        execution_masks = torch.cat([item[1] for item in parts]).to(device)
+        task_ids = sum([item[2] for item in parts], [])
+        episode_ids = torch.cat([item[3] for item in parts]).to(device)
+        timesteps = torch.cat([item[4] for item in parts]).to(device)
+    actions = make_rankq_actions(
+        action_chunks, execution_masks,
+        action_mean=pool.action_mean, action_std=pool.action_std,
+        action_min=pool.action_min, action_max=pool.action_max,
+        noise_sigma=settings["noise_sigma"], task_ids=task_ids,
+        episode_ids=episode_ids, timesteps=timesteps)
+    if world > 1:
+        actions = actions.index_select(torch.arange(offset, offset + batch.batch_size, device=device))
+    success = batch.successes.bool()
+    valid_perm = actions.permuted_valid_mask
+    counts = torch.tensor([int(success.sum()), int((~success).sum()), int((success & valid_perm).sum())], device=device, dtype=torch.float64)
+    if world > 1:
+        dist.all_reduce(counts)
+    mode = config.get("training", {}).get("critic_sampling", {}).get("mode")
+    mask = bootstrap_mask(core.num_pairs, batch.batch_size,
+                          float(config["critic"].get("bootstrap_probability", 1.0)),
+                          device=device, generator=state.target_generator)
+    if mode == "member_episode_bootstrap":
+        from .episode_bootstrap import member_owner_loss_mask
+        mask = member_owner_loss_mask(batch, core.num_pairs, device=device)
+    elif mode == "shared_episode_bootstrap":
+        mask = torch.tensor([m["bootstrap_inclusion"] for m in batch.behavior_metadata], device=device).T.bool()
+    if mode == "shared_episode_bootstrap":
+        member_counts = mask.sum(1).double()
+        if world > 1:
+            dist.all_reduce(member_counts)
+        weights = mask.float() * world / (core.num_pairs * member_counts.clamp_min(1)[:, None])
+    else:
+        count = mask.sum().double()
+        if world > 1:
+            dist.all_reduce(count)
+        weights = mask.float() * world / count.clamp_min(1)
+    combined = {}
+    values = []
+    starts = list(range(0, batch.batch_size, microbatch_size))
+    for index, start in enumerate(starts):
+        indices = torch.arange(start, min(start + microbatch_size, batch.batch_size), device=device)
+        sample = batch.index_select(indices)
+        subset = actions.index_select(indices)
+        local_masks = [sample.successes.bool(), ~sample.successes.bool(), sample.successes.bool() & subset.permuted_valid_mask]
+        scales = {name: ddp_global_valid_mean_scale(int(mask.sum()), int(count), world)
+                  for name, mask, count in zip(("success", "failure", "permuted"), local_masks, counts, strict=True)}
+        metrics = _multimodal_double_q_divl_update(
+            state, sample, config, zero_grad=index == 0, optimizer_step=index == len(starts)-1,
+            full_rankq_actions=subset, full_rankq_mean_scales=scales,
+            base_member_weights=weights.index_select(1, indices), diagnostic_values=values)
+        for key, value in metrics.items():
+            factor = 1.0 if key in {"q_loss", "divl_loss", "divl_objective_loss"} else sample.batch_size / batch.batch_size
+            combined[key] = combined.get(key, 0.0) + factor * value
+    ranking = {name: torch.cat([item[0][name] for item in values], 1).cpu() for name in values[0][0]}
+    q = torch.cat([item[1] for item in values], 2).cpu()
+    y = torch.cat([item[2] for item in values], 1).cpu()
+    payload = (ranking, q, y, success.cpu(), valid_perm.cpu(), actions.same_episode_permuted_mask.cpu(), batch.task_ids)
+    payloads = [payload]
+    if world > 1:
+        payloads = [None] * world
+        dist.all_gather_object(payloads, payload)
+    ranking = {name: torch.cat([item[0][name] for item in payloads], 1) for name in ranking}
+    q = torch.cat([item[1] for item in payloads], 2)
+    y = torch.cat([item[2] for item in payloads], 1)
+    success = torch.cat([item[3] for item in payloads])
+    valid_perm = torch.cat([item[4] for item in payloads])
+    same_episode = torch.cat([item[5] for item in payloads])
+    task_ids = sum([list(item[6]) for item in payloads], [])
+    output = compute_rankq_loss(ranking, success, permuted_valid_mask=valid_perm,
+                               alpha_success=settings["alpha_success"], alpha_failure=settings["alpha_failure"],
+                               use_random_negative=settings["use_random_negative"], use_permuted_negative=settings["use_permuted_negative"],
+                               pair_loss=settings["pair_loss"], temperature=settings["temperature"], max_gap=settings["max_gap"])
+    combined.update(output.metrics)
+    combined.update(scalar_q_scale_metrics(q, y))
+    combined["rankq_weighted_loss"] = settings["lambda_rank"] * float(output.loss)
+    combined["rankq_total_lambda_weighted_loss"] = combined["rankq_weighted_loss"]
+    combined["same_episode_permuted_fraction"] = float(same_episode.sum() / valid_perm.sum().clamp_min(1))
+    combined["batch_success_fraction"] = float(success.float().mean())
+    combined["batch_failure_fraction"] = float((~success).float().mean())
+    diagnostic_tasks = config.get("training", {}).get("critic_sampling", {}).get("task_names") or sorted(set(task_ids))
+    for task in diagnostic_tasks:
+        selected = torch.tensor([value == task for value in task_ids])
+        combined[f"batch_task/{task}/count"] = float(selected.sum())
+        combined[f"batch_task/{task}/success_count"] = float((selected & success).sum())
+        combined[f"batch_task/{task}/failure_count"] = float((selected & ~success).sum())
+    # Base scalars are rank-local world-scaled sums; the launcher's distributed
+    # metric mean gives the global base objective. Rank metrics above are
+    # already global (including exact median/p90), identical on every rank.
+    for key in ("critic_loss", "total_loss", "total_critic_loss"):
+        combined[key] = combined["divl_objective_loss"] + combined["rankq_weighted_loss"]
+    for key in ("critic_grad_norm", "critic_grad_norm_preclip", "critic_grad_norm_postclip", "critic_grad_clip_scale", "target_updated"):
+        combined[key] = metrics[key]
+    combined.update(v_loss=combined["divl_loss"], effective_batch_size=float(batch.batch_size),
+                    microbatch_size=float(microbatch_size), gradient_accumulation_steps=float(len(starts)))
+    if not all(math.isfinite(value) for value in combined.values()):
+        raise FloatingPointError("non-finite full RankQ metrics")
+    return combined
+
+
 def accumulated_critic_update(
     state: OGPOTrainState,
     batch: ChunkBatch,
@@ -2790,6 +2989,9 @@ def accumulated_critic_update(
     microbatch_size = int(microbatch_size)
     if microbatch_size <= 0:
         raise ValueError("critic microbatch_size must be positive")
+    settings = full_rankq_settings(config.get("critic", {}), optimizer_step=state.step)
+    if settings["full"] and settings["enabled"]:
+        return _accumulated_full_rankq_update(state, batch, config, microbatch_size, settings)
     if config.get("training", {}).get("critic_sampling", {}).get("mode") == "shared_episode_bootstrap":
         from .episode_bootstrap import normalize_shared_member_weights
         batch = normalize_shared_member_weights(batch, device=next(state.critic.parameters()).device)
@@ -3524,6 +3726,71 @@ def _success_subset(batch: ChunkBatch) -> ChunkBatch | None:
     return batch.index_select(indices)
 
 
+def adaptive_success_bc_lambda(
+    flash_grad_norm: float,
+    bc_grad_norm: float,
+    cosine: float,
+    *,
+    lambda0: float = 0.005,
+    rho: float = 0.2,
+    eps: float = 1.0e-12,
+) -> tuple[float, float]:
+    """Return ``(lambda_eff, lambda_cap)`` for a BC gradient-fraction cap.
+
+    The cap solves ``||lambda * g_bc|| / ||g_flash + lambda * g_bc|| = rho``
+    using only the two component norms and their cosine.  ``lambda0`` remains
+    the nominal BC coefficient whenever that coefficient is already below the
+    requested fraction.
+    """
+    a = float(flash_grad_norm)
+    b = float(bc_grad_norm)
+    c = max(-1.0, min(1.0, float(cosine)))
+    lambda0 = float(lambda0)
+    rho = float(rho)
+    eps = float(eps)
+    if not all(math.isfinite(value) for value in (a, b, c, lambda0, rho, eps)):
+        raise FloatingPointError("adaptive success-BC inputs must be finite")
+    if a < 0.0 or b < 0.0 or lambda0 < 0.0 or eps <= 0.0:
+        raise ValueError("gradient norms/lambda0 must be non-negative and eps positive")
+    if not 0.0 < rho < 1.0:
+        raise ValueError("adaptive success-BC rho must be in (0, 1)")
+    if b <= eps:
+        return lambda0, math.inf
+    rho2 = rho * rho
+    x = (
+        rho2 * c
+        + rho * math.sqrt(max(0.0, 1.0 - rho2 + rho2 * c * c))
+    ) / (1.0 - rho2)
+    lambda_cap = x * a / (b + eps)
+    lambda_eff = min(lambda0, max(0.0, lambda_cap))
+    return lambda_eff, lambda_cap
+
+
+def _success_only_flow_matching_loss(
+    state: OGPOTrainState,
+    batch: ChunkBatch,
+    success_batch: ChunkBatch | None,
+) -> tuple[torch.Tensor, dict[str, float]]:
+    """Native PI0.5 logged-action flow matching on successful trajectories."""
+    success_source = success_batch if success_batch is not None else _success_subset(batch)
+    if success_source is None:
+        parameter = next(state.policy.parameters())
+        return parameter.new_zeros(()), {"success_buffer_loss": 0.0}
+    policy_parameter = next(state.policy.parameters())
+    success_source = success_source.to(policy_parameter.device)
+    if not bool(success_source.successes.bool().all().item()):
+        raise ValueError("adaptive success BC received a non-success replay sample")
+    success_condition = _policy_condition(state.policy, success_source)
+    success = success_buffer_loss(
+        state.policy,
+        success_condition,
+        state.policy.action_chunks_to_flow(success_source).reshape(
+            success_source.batch_size, -1
+        ),
+    )
+    return success.loss, success.diagnostics
+
+
 def _actor_regularization_loss(
     state: OGPOTrainState,
     batch: ChunkBatch,
@@ -3734,26 +4001,10 @@ def _selected_transition_reference_kl(
         stop = min(start + microbatch_size, count)
         indices = torch.arange(start, stop, device=x_t.device)
         micro_condition = _condition_index_select(condition, indices)
-        current_mean = state.policy.transition_mean(
-            x_t[start:stop], micro_condition, timestep[start:stop]
-        )
-        current_log_std = state.policy.transition_log_std(
-            x_t[start:stop], timestep[start:stop]
-        )
-        reference_mean = state.reference_policy.transition_mean(
-            x_t[start:stop], micro_condition, timestep[start:stop]
-        )
-        reference_log_std = state.reference_policy.transition_log_std(
-            x_t[start:stop], timestep[start:stop]
-        )
-        total += float(
-            gaussian_kl_diag(
-                current_mean,
-                current_log_std,
-                reference_mean,
-                reference_log_std,
-            ).sum().item()
-        )
+        total += float(_policy_kl_device_aware(
+            state.policy, state.reference_policy, x_t[start:stop],
+            micro_condition, timestep[start:stop],
+        ).sum().item())
     return total / max(count, 1)
 
 
@@ -3957,6 +4208,12 @@ def _selected_transition_log_probs(
     if microbatch_size <= 0:
         raise ValueError("actor.chi2.logprob_microbatch_size must be positive")
     values = []
+    output_device = x_t.device
+    policy_device = _policy_device(policy)
+    x_prev = x_prev.to(policy_device)
+    x_t = x_t.to(policy_device)
+    timestep = timestep.to(policy_device)
+    condition = _condition_to_device(condition, policy_device)
     for start in range(0, x_t.shape[0], microbatch_size):
         stop = min(start + microbatch_size, x_t.shape[0])
         indices = torch.arange(start, stop, device=x_t.device)
@@ -3968,7 +4225,7 @@ def _selected_transition_log_probs(
                 timestep[start:stop],
             )
         )
-    return torch.cat(values, dim=0)
+    return torch.cat(values, dim=0).to(output_device)
 
 
 def _chi2_ratio_metrics(stats: Chi2RatioStats) -> dict[str, float]:
@@ -4002,8 +4259,8 @@ def _selected_transition_chi2_ratio(
     config: dict[str, Any],
 ) -> tuple[torch.Tensor, dict[str, float]]:
     """Compute the Flash selected-transition current/slow ratio for chiPO."""
-    if ogpo_variant(config) != "chi2":
-        raise ValueError("selected χ² ratio was requested outside actor.ogpo_variant=chi2")
+    if ogpo_variant(config) not in {"chi2", "ca_chi2"}:
+        raise ValueError("selected χ² ratio requires actor.ogpo_variant=chi2 or ca_chi2")
     if state.slow_policy is None:
         raise RuntimeError("OGPO+χ² requires an initialized slow policy")
     chi2_cfg = _chi2_config(config)
@@ -4045,13 +4302,21 @@ def _select_flash_steps(
     device: torch.device,
     seed: int | None = None,
 ) -> torch.Tensor:
+    # The constant-corrected schedule ends with a deterministic Euler/Dirac
+    # transition (zero variance).  Flash PPO requires a stochastic transition
+    # with a defined density ratio and KL, so that final step is not eligible.
+    selectable_steps = int(num_steps)
+    if str(flow_cfg.get("sde_mode", "gaussian_adapter")) == "ogpo_constant_corrected":
+        selectable_steps -= 1
+    if selectable_steps <= 0:
+        raise ValueError("Flash PPO requires at least one stochastic flow transition")
     distribution = str(flow_cfg.get("selected_timestep_distribution", "fixed"))
     if distribution == "uniform":
         generator = None
         if seed is not None:
             generator = torch.Generator().manual_seed(int(seed))
         return torch.randint(
-            num_steps,
+            selectable_steps,
             (batch_size,),
             generator=generator,
         ).to(device)
@@ -4060,14 +4325,17 @@ def _select_flash_steps(
         if seed is not None:
             generator = torch.Generator().manual_seed(int(seed))
         permutations = [
-            torch.randperm(num_steps, generator=generator)
-            for _ in range(math.ceil(batch_size / num_steps))
+            torch.randperm(selectable_steps, generator=generator)
+            for _ in range(math.ceil(batch_size / selectable_steps))
         ]
         return torch.cat(permutations)[:batch_size].to(device)
     if distribution == "fixed":
-        selected = int(flow_cfg.get("selected_timestep", num_steps // 2))
-        if selected < 0 or selected >= num_steps:
-            raise ValueError("flow.selected_timestep must be in [0, flow.num_steps)")
+        selected = int(flow_cfg.get("selected_timestep", selectable_steps // 2))
+        if selected < 0 or selected >= selectable_steps:
+            raise ValueError(
+                "flow.selected_timestep must select a stochastic transition; "
+                f"valid range is [0, {selectable_steps})"
+            )
         return torch.full((batch_size,), selected, dtype=torch.long, device=device)
     raise ValueError(f"unsupported selected_timestep_distribution={distribution!r}")
 
@@ -5498,7 +5766,28 @@ def flash_actor_update(
     actor_cfg = config.get("actor", {})
     flow_cfg = config.get("flow", {})
     regularization_cfg = config.get("regularization", {})
+    adaptive_bc_cfg = regularization_cfg.get("adaptive_success_bc", {})
+    adaptive_success_bc = bool(adaptive_bc_cfg.get("enabled", False))
+    adaptive_bc_lambda0 = float(adaptive_bc_cfg.get("lambda0", 0.005))
+    adaptive_bc_rho = float(adaptive_bc_cfg.get("rho", 0.2))
+    adaptive_bc_eps = float(adaptive_bc_cfg.get("eps", 1.0e-12))
+    reference_kl_enabled = bool(actor_cfg.get("reference_kl_enabled", True))
     uncertainty_cfg = config.get("uncertainty", {})
+    diagnostics_cfg = config.get("diagnostics", {})
+    component_grad_diagnostics = bool(
+        diagnostics_cfg.get("actor_component_grad_norms", False)
+    )
+    diagnostic_no_optimizer_step = bool(
+        diagnostics_cfg.get("actor_gradient_probe_no_step", False)
+    )
+    if diagnostic_no_optimizer_step and not component_grad_diagnostics:
+        raise ValueError(
+            "actor_gradient_probe_no_step requires actor_component_grad_norms=true"
+        )
+    if not reference_kl_enabled and float(regularization_cfg.get("beta_kl", 0.01)) != 0.0:
+        raise ValueError(
+            "actor.reference_kl_enabled=false requires regularization.beta_kl=0"
+        )
     batch = batch.to(next(state.policy.parameters()).device)
     group_size = int(actor_cfg.get("candidate_group_size", actor_cfg.get("group_size", 4)))
     gradient_microbatch_size = int(actor_cfg.get("gradient_microbatch_size", group_size))
@@ -5537,6 +5826,41 @@ def flash_actor_update(
     sampling_step = int(state.step if actor_step is None else actor_step)
     sampling_seed = int(config.get("training", {}).get("seed", 0)) + sampling_step
     actor_epochs = max(1, int(actor_cfg.get("actor_epochs_per_rollout", 1)))
+    if diagnostic_no_optimizer_step and actor_epochs != 1:
+        raise ValueError("Flash actor gradient probe requires exactly one actor epoch")
+    if adaptive_success_bc:
+        if diagnostic_no_optimizer_step:
+            raise ValueError(
+                "adaptive success BC and the legacy no-step gradient probe are mutually exclusive"
+            )
+        if actor_epochs != 1:
+            raise ValueError("adaptive success BC requires exactly one Flash actor epoch")
+        if success_update_period != 1:
+            raise ValueError("adaptive success BC currently requires success_update_period=1")
+        if _using_jax_actor(state.policy):
+            raise ValueError("adaptive success BC is implemented for the PyTorch Flash path")
+        if float(regularization_cfg.get("lambda_success", 0.0)) <= 0.0:
+            raise ValueError(
+                "adaptive success BC requires regularization.lambda_success > 0 "
+                "to enable the success-only replay"
+            )
+        if (
+            float(regularization_cfg.get("lambda_fm", 0.0)) != 0.0
+            or float(regularization_cfg.get("lambda_smooth", 0.0)) != 0.0
+        ):
+            raise ValueError(
+                "adaptive success BC requires lambda_fm=lambda_smooth=0 so the "
+                "actor step has exactly two backward passes"
+            )
+        # Validate the coefficient controls before the expensive rollout.
+        adaptive_success_bc_lambda(
+            1.0,
+            1.0,
+            0.0,
+            lambda0=adaptive_bc_lambda0,
+            rho=adaptive_bc_rho,
+            eps=adaptive_bc_eps,
+        )
     stabilize_on_policy_statistics = bool(
         actor_cfg.get("stabilize_single_epoch_bf16_statistics", False)
     )
@@ -7215,17 +7539,29 @@ def flash_actor_update(
         return metrics
 
     with torch.no_grad():
-        old_rollout = sample_flash_rollout(
-            state.old_policy,
-            condition,
-            group_size=group_size,
-            selected_step=selected_steps,
+        policy_device = _policy_device(state.policy)
+        old_device = _policy_device(state.old_policy)
+        old_condition = (
+            _policy_condition(state.old_policy, batch)
+            if old_device != policy_device else condition
         )
-        environment_endpoint = state.old_policy.flat_actions_to_environment(old_rollout.endpoint, condition_g)
+        # Generic flow policies return batch.observations without migration.
+        old_condition = _condition_to_device(old_condition, old_device)
+        old_condition_g = state.old_policy.repeat_condition(old_condition, group_size)
+        role_old_rollout = sample_flash_rollout(
+            state.old_policy,
+            old_condition,
+            group_size=group_size,
+            selected_step=selected_steps.to(old_device),
+        )
+        environment_endpoint = state.old_policy.flat_actions_to_environment(
+            role_old_rollout.endpoint, old_condition_g,
+        ).to(policy_device)
+        old_rollout = _rollout_to_device(role_old_rollout, policy_device)
         endpoint = environment_endpoint.reshape(batch.batch_size, group_size, -1)
         chi2_diag: dict[str, float] = {"chi2_enabled": 0.0}
         chi2_ratio = None
-        if ogpo_variant(config) == "chi2":
+        if ogpo_variant(config) in {"chi2", "ca_chi2"}:
             chi2_ratio_flat, chi2_diag = _selected_transition_chi2_ratio(
                 state,
                 x_prev=old_rollout.x_prev,
@@ -7287,7 +7623,18 @@ def flash_actor_update(
     raw_per_sample_values: list[torch.Tensor] = []
     kl_beta = entropy_norm.new_tensor(float(regularization_cfg.get("beta_kl", 0.01)))
     reg_diag: dict[str, float] = {}
-    post_update_action = _post_update_kl_action(actor_cfg)
+    adaptive_bc_metrics: dict[str, float] = {
+        "flash_grad_norm": 0.0,
+        "bc_grad_norm": 0.0,
+        "flash_bc_cosine": 0.0,
+        "bc_lambda_eff": 0.0,
+        "bc_weighted_grad_norm": 0.0,
+        "bc_grad_fraction": 0.0,
+        "bc_cap_triggered": 0.0,
+    }
+    post_update_action = (
+        _post_update_kl_action(actor_cfg) if reference_kl_enabled else "monitor"
+    )
     post_update_kl_limit = float(
         actor_cfg.get("max_policy_reference_kl", float("inf"))
     )
@@ -7302,7 +7649,7 @@ def flash_actor_update(
         chi2_diag.get("chi2_selected_logprob_normalizer", 1.0)
     )
     chi2_upper_ratio_bound = None
-    if ogpo_variant(config) == "chi2":
+    if ogpo_variant(config) in {"chi2", "ca_chi2"}:
         chi2_upper_ratio_bound = chi2_ppo_upper_bound(
             eps_clip,
             beta=float(adv_diag["chi2_beta"]),
@@ -7369,20 +7716,30 @@ def flash_actor_update(
                 ),
                 rectification_weight=rectification[start:stop],
             )
-            with torch.no_grad():
-                reference_mean = state.reference_policy.transition_mean(
-                    x_t, micro_condition, timestep
-                )
-                reference_log_std = state.reference_policy.transition_log_std(
-                    x_t, timestep
-                )
-            transition_ref_kl = gaussian_kl_diag(
-                current_mean, current_log_std, reference_mean, reference_log_std
-            )
             sample_fraction = (stop - start) / num_candidates
-            kl_penalty = (
-                candidate_beta[start:stop] * transition_ref_kl
-            ).sum() / num_candidates
+            if reference_kl_enabled:
+                with torch.no_grad():
+                    reference_device = _policy_device(state.reference_policy)
+                    reference_condition = _condition_to_device(
+                        micro_condition, reference_device
+                    )
+                    reference_mean = state.reference_policy.transition_mean(
+                        x_t.to(reference_device),
+                        reference_condition,
+                        timestep.to(reference_device),
+                    ).to(current_mean.device)
+                    reference_log_std = state.reference_policy.transition_log_std(
+                        x_t.to(reference_device), timestep.to(reference_device)
+                    ).to(current_mean.device)
+                transition_ref_kl = gaussian_kl_diag(
+                    current_mean, current_log_std, reference_mean, reference_log_std
+                )
+                kl_penalty = (
+                    candidate_beta[start:stop] * transition_ref_kl
+                ).sum() / num_candidates
+            else:
+                transition_ref_kl = current_mean.new_zeros((stop - start,))
+                kl_penalty = current_mean.new_zeros(())
             micro_loss = flash.loss * sample_fraction + kl_penalty
             if compute_step_grad_diagnostics:
                 for step_idx, count in enumerate(selected_counts.tolist()):
@@ -7438,44 +7795,306 @@ def flash_actor_update(
             epoch_ratios.append(ratio.cpu())
             epoch_clipped_ratios.append(clipped_ratio.cpu())
             epoch_raw_per_sample.append(raw_flash.per_sample_loss.detach().cpu())
-            del current_mean, new_log_prob, ppo_new_log_prob, reference_mean, transition_ref_kl, micro_loss
-        reg_loss, reg_diag = _actor_regularization_loss(
-            state,
-            batch,
-            config,
-            fm_batch=fm_batch,
-            success_batch=success_batch,
-        )
-        if reg_loss.requires_grad:
-            reg_loss.backward()
-        epoch_loss += float(reg_loss.detach().item())
+            del current_mean, new_log_prob, ppo_new_log_prob, transition_ref_kl, micro_loss
+        # At this point .grad is g_flash: the selected-transition Flash
+        # objective plus its existing reference-KL term.  Adaptive success BC
+        # saves that gradient, performs exactly one native PI0.5 flow-matching
+        # backward on successful logged actions, then writes
+        # g_flash + lambda_eff * g_bc back to .grad.  There is no third
+        # backward and the existing clip/optimizer/KL-guard path remains below.
+        if adaptive_success_bc and success_update_due:
+            flash_gradients: dict[str, torch.Tensor] = {}
+            flash_square = 0.0
+            flash_group_squares_float: dict[str, float] = {}
+            for parameter_name, parameter in state.policy.named_parameters():
+                if not parameter.requires_grad or parameter.grad is None:
+                    continue
+                gradient = parameter.grad.detach().clone()
+                if not bool(torch.isfinite(gradient).all().item()):
+                    raise FloatingPointError("non-finite Flash actor gradient")
+                flash_gradients[parameter_name] = gradient
+                square = float(gradient.float().square().sum().item())
+                flash_square += square
+                group = _actor_gradient_group(parameter_name)
+                flash_group_squares_float[group] = (
+                    flash_group_squares_float.get(group, 0.0) + square
+                )
+            flash_component_grad_norm = math.sqrt(flash_square)
+            flash_group_norms = {
+                group: math.sqrt(square)
+                for group, square in flash_group_squares_float.items()
+            }
+            state.actor_optimizer.zero_grad(set_to_none=True)
+            bc_loss, reg_diag = _success_only_flow_matching_loss(
+                state, batch, success_batch
+            )
+            if not bc_loss.requires_grad:
+                raise RuntimeError("adaptive success BC has no successful replay sample")
+            bc_loss.backward()
+
+            bc_square_float = 0.0
+            flash_bc_dot = 0.0
+            component_group_squares_float: dict[str, float] = {}
+            component_group_dots_float: dict[str, float] = {}
+            named_parameters = dict(state.policy.named_parameters())
+            for parameter_name, parameter in named_parameters.items():
+                if not parameter.requires_grad or parameter.grad is None:
+                    continue
+                bc_gradient = parameter.grad.detach()
+                if not bool(torch.isfinite(bc_gradient).all().item()):
+                    raise FloatingPointError("non-finite success-BC actor gradient")
+                bc_square = float(bc_gradient.float().square().sum().item())
+                bc_square_float += bc_square
+                group = _actor_gradient_group(parameter_name)
+                component_group_squares_float[group] = (
+                    component_group_squares_float.get(group, 0.0) + bc_square
+                )
+                flash_gradient = flash_gradients.get(parameter_name)
+                if flash_gradient is not None:
+                    dot = float(
+                        (
+                            flash_gradient.float()
+                            * bc_gradient.to(
+                                device=flash_gradient.device, dtype=torch.float32
+                            )
+                        ).sum().item()
+                    )
+                    flash_bc_dot += dot
+                    component_group_dots_float[group] = (
+                        component_group_dots_float.get(group, 0.0) + dot
+                    )
+            bc_component_grad_norm = math.sqrt(bc_square_float)
+            flash_bc_grad_cosine = (
+                flash_bc_dot
+                / (flash_component_grad_norm * bc_component_grad_norm)
+                if flash_component_grad_norm > 0.0 and bc_component_grad_norm > 0.0
+                else 0.0
+            )
+            flash_bc_grad_cosine = max(-1.0, min(1.0, flash_bc_grad_cosine))
+            lambda_eff, lambda_cap = adaptive_success_bc_lambda(
+                flash_component_grad_norm,
+                bc_component_grad_norm,
+                flash_bc_grad_cosine,
+                lambda0=adaptive_bc_lambda0,
+                rho=adaptive_bc_rho,
+                eps=adaptive_bc_eps,
+            )
+            for parameter_name, parameter in named_parameters.items():
+                if not parameter.requires_grad:
+                    continue
+                flash_gradient = flash_gradients.get(parameter_name)
+                bc_gradient = parameter.grad
+                if flash_gradient is None:
+                    if bc_gradient is not None:
+                        parameter.grad = bc_gradient.mul(lambda_eff)
+                    continue
+                parameter.grad = flash_gradient
+                if bc_gradient is not None:
+                    parameter.grad.add_(bc_gradient, alpha=lambda_eff)
+            actor_grad_norm = float(grad_norm(state.policy.parameters()))
+            if not math.isfinite(actor_grad_norm):
+                raise FloatingPointError("non-finite combined Flash + success-BC gradient")
+            weighted_bc_norm = lambda_eff * bc_component_grad_norm
+            adaptive_bc_metrics = {
+                "flash_grad_norm": flash_component_grad_norm,
+                "bc_grad_norm": bc_component_grad_norm,
+                "flash_bc_cosine": flash_bc_grad_cosine,
+                "bc_lambda_eff": lambda_eff,
+                "bc_weighted_grad_norm": weighted_bc_norm,
+                "bc_grad_fraction": weighted_bc_norm / max(actor_grad_norm, adaptive_bc_eps),
+                "bc_cap_triggered": float(lambda_cap < adaptive_bc_lambda0),
+            }
+            bc_group_norms = {
+                group: math.sqrt(square)
+                for group, square in component_group_squares_float.items()
+            }
+            group_cosines = {}
+            for group in set(flash_group_norms) | set(bc_group_norms):
+                denominator = flash_group_norms.get(group, 0.0) * bc_group_norms.get(group, 0.0)
+                group_cosines[group] = (
+                    component_group_dots_float.get(group, 0.0) / denominator
+                    if denominator > 0.0
+                    else 0.0
+                )
+            epoch_loss += lambda_eff * float(bc_loss.detach().item())
+        else:
+            # Historical path is deliberately kept intact.  With the adaptive
+            # feature disabled this preserves the baseline's loss weighting,
+            # backward order, gradient clipping, and optimizer behavior.
+            flash_component_grad_norm = (
+                float(grad_norm(state.policy.parameters()))
+                if component_grad_diagnostics
+                else 0.0
+            )
+            flash_group_norms = (
+                _gradient_group_norms(state.policy)
+                if component_grad_diagnostics
+                else {}
+            )
+            reg_loss, reg_diag = _actor_regularization_loss(
+                state,
+                batch,
+                config,
+                fm_batch=fm_batch,
+                success_batch=success_batch,
+            )
+            component_accumulator: dict[str, torch.Tensor | None] = {
+                "bc_square": None,
+                "flash_bc_dot": None,
+            }
+            component_group_squares: dict[str, torch.Tensor] = {}
+            component_group_dots: dict[str, torch.Tensor] = {}
+            component_hooks = []
+            if component_grad_diagnostics and reg_loss.requires_grad:
+                for parameter_name, parameter in state.policy.named_parameters():
+                    if not parameter.requires_grad:
+                        continue
+                    parameter_group = _actor_gradient_group(parameter_name)
+
+                    def capture_bc_gradient(
+                        gradient,
+                        *,
+                        parameter=parameter,
+                        parameter_group=parameter_group,
+                    ):
+                        detached = gradient.detach().float()
+                        square = detached.square().sum()
+                        previous_square = component_accumulator["bc_square"]
+                        component_accumulator["bc_square"] = (
+                            square if previous_square is None else previous_square + square
+                        )
+                        component_group_squares[parameter_group] = (
+                            square
+                            if parameter_group not in component_group_squares
+                            else component_group_squares[parameter_group] + square
+                        )
+                        if parameter.grad is not None:
+                            dot = (
+                                detached
+                                * parameter.grad.detach().to(
+                                    device=detached.device,
+                                    dtype=detached.dtype,
+                                )
+                            ).sum()
+                            previous_dot = component_accumulator["flash_bc_dot"]
+                            component_accumulator["flash_bc_dot"] = (
+                                dot if previous_dot is None else previous_dot + dot
+                            )
+                            component_group_dots[parameter_group] = (
+                                dot
+                                if parameter_group not in component_group_dots
+                                else component_group_dots[parameter_group] + dot
+                            )
+                        return gradient
+
+                    component_hooks.append(parameter.register_hook(capture_bc_gradient))
+            try:
+                if reg_loss.requires_grad:
+                    reg_loss.backward()
+            finally:
+                for hook in component_hooks:
+                    hook.remove()
+            epoch_loss += float(reg_loss.detach().item())
+            actor_grad_norm = float(grad_norm(state.policy.parameters()))
+            bc_square = component_accumulator["bc_square"]
+            bc_component_grad_norm = (
+                float(bc_square.sqrt().item()) if bc_square is not None else 0.0
+            )
+            flash_bc_dot_tensor = component_accumulator["flash_bc_dot"]
+            flash_bc_dot = (
+                float(flash_bc_dot_tensor.item())
+                if flash_bc_dot_tensor is not None
+                else 0.0
+            )
+            flash_bc_grad_cosine = (
+                flash_bc_dot / (flash_component_grad_norm * bc_component_grad_norm)
+                if flash_component_grad_norm > 0.0 and bc_component_grad_norm > 0.0
+                else 0.0
+            )
+            bc_group_norms = {
+                group: float(square.sqrt().item())
+                for group, square in component_group_squares.items()
+            }
+            group_cosines = {}
+            for group in set(flash_group_norms) | set(bc_group_norms):
+                flash_norm = float(flash_group_norms.get(group, 0.0))
+                bc_norm = float(bc_group_norms.get(group, 0.0))
+                dot = component_group_dots.get(group)
+                group_cosines[group] = (
+                    float(dot.item()) / (flash_norm * bc_norm)
+                    if dot is not None and flash_norm > 0.0 and bc_norm > 0.0
+                    else 0.0
+                )
         assert_no_gradients(state.critic, "critic")
         if state.divl is not None:
             assert_no_gradients(state.divl, "divl")
         assert_no_gradients(state.reference_policy, "reference_policy")
         if state.slow_policy is not None:
             assert_no_gradients(state.slow_policy, "slow_policy")
-        actor_grad_norm = float(grad_norm(state.policy.parameters()))
+        if diagnostic_no_optimizer_step:
+            lambda_success = float(regularization_cfg.get("lambda_success", 0.0))
+            if lambda_success <= 0.0:
+                raise ValueError("Flash PPO/BC gradient probe requires lambda_success > 0")
+            bc_unweighted_norm = bc_component_grad_norm / lambda_success
+            result: dict[str, float] = {
+                "actor_loss": float(epoch_loss),
+                "flash_ppo_loss": float(epoch_flash),
+                "success_buffer_loss": float(reg_diag.get("success_buffer_loss", 0.0)),
+                "flash_component_grad_norm": flash_component_grad_norm,
+                "bc_component_grad_norm": bc_component_grad_norm,
+                "bc_unweighted_component_grad_norm": bc_unweighted_norm,
+                "flash_bc_grad_cosine": flash_bc_grad_cosine,
+                "combined_grad_norm": actor_grad_norm,
+                "bc_fraction_of_combined_grad": bc_component_grad_norm
+                / max(actor_grad_norm, 1.0e-12),
+                "flash_zero_gradient": float(flash_component_grad_norm <= 1.0e-12),
+                "candidate_group_size": float(group_size),
+                "selected_step": float(selected_steps.float().mean().item()),
+                **{
+                    key: float(value)
+                    for key, value in adv_diag.items()
+                    if isinstance(value, (int, float))
+                },
+            }
+            for group in ("backbone", "action_expert", "other"):
+                flash_group = float(flash_group_norms.get(group, 0.0))
+                bc_weighted_group = float(bc_group_norms.get(group, 0.0))
+                result.update(
+                    {
+                        f"{group}_flash_grad_norm": flash_group,
+                        f"{group}_bc_unweighted_grad_norm": bc_weighted_group
+                        / lambda_success,
+                        f"{group}_flash_bc_grad_cosine": float(
+                            group_cosines.get(group, 0.0)
+                        ),
+                    }
+                )
+            state.actor_optimizer.zero_grad(set_to_none=True)
+            return result
         actor_grad_clip_scale = min(
             1.0,
             float(actor_cfg.get("max_grad_norm", 1.0)) / max(actor_grad_norm, 1e-12),
         )
         rollback_snapshot = None
-        if post_update_action == "rollback_cpu":
+        if reference_kl_enabled and post_update_action == "rollback_cpu":
             rollback_snapshot = _capture_actor_rollback_state(state)
         torch.nn.utils.clip_grad_norm_(state.policy.parameters(), float(actor_cfg.get("max_grad_norm", 1.0)))
         state.actor_optimizer.step()
-        post_update_kl = _selected_transition_reference_kl(
-            state,
-            x_t=old_rollout.x_t,
-            timestep=old_rollout.timestep,
-            condition=condition_g,
-            microbatch_size=int(
-                actor_cfg.get("kl_eval_microbatch_size", gradient_microbatch_size)
-            ),
+        post_update_kl = (
+            _selected_transition_reference_kl(
+                state,
+                x_t=old_rollout.x_t,
+                timestep=old_rollout.timestep,
+                condition=condition_g,
+                microbatch_size=int(
+                    actor_cfg.get("kl_eval_microbatch_size", gradient_microbatch_size)
+                ),
+            )
+            if reference_kl_enabled
+            else 0.0
         )
         post_update_kl_last = post_update_kl
-        violates_post_update_kl = (
+        violates_post_update_kl = reference_kl_enabled and (
             not math.isfinite(post_update_kl)
             or post_update_kl > post_update_kl_limit
         )
@@ -7537,6 +8156,7 @@ def flash_actor_update(
         "accepted_actor_epochs": float(accepted_actor_epochs),
         "rejected_actor_epochs": float(rejected_actor_epochs),
         "reference_kl_beta": float(kl_beta.detach().item()),
+        "reference_kl_enabled": float(reference_kl_enabled),
         "ustate_adapt_ppo_clip": float(bool(uncertainty_cfg.get("adapt_ppo_clip", False))),
         "ustate_adapt_kl_beta": float(bool(uncertainty_cfg.get("adapt_kl_beta", False))),
         "actor_epochs": float(actor_epochs),
@@ -7570,6 +8190,11 @@ def flash_actor_update(
         **adv_diag,
         **chi2_diag,
     }
+    if adaptive_success_bc:
+        metrics.update(adaptive_bc_metrics)
+        metrics["adaptive_success_bc_enabled"] = 1.0
+        metrics["bc_lambda_nominal"] = adaptive_bc_lambda0
+        metrics["bc_grad_fraction_target"] = adaptive_bc_rho
     for step_idx, count in enumerate(selected_counts.tolist()):
         metrics[f"selected_step_count_{step_idx}"] = float(count)
         metrics[f"rectifier_count_{step_idx}"] = float(state.rectifier.counts[step_idx].item())
@@ -7898,7 +8523,7 @@ def _policy_checkpoint_state(
             ),
             "state": policy.adapter_state_dict(include_backend=include_pytorch_backend),
             "environment_action_dim": policy.environment_action_dim,
-            "flow_action_dim": policy.environment_action_dim,
+            "flow_action_dim": policy.flow_action_dim,
             "backend_train_mode": policy.backend_train_mode,
             "residual_enabled": bool(getattr(policy, "residual_enabled", True)),
             "sde_mode": policy.sde_mode,
@@ -8336,8 +8961,8 @@ def initialize_critic_from_checkpoint(
 ) -> dict[str, Any]:
     """Initialize a critic while keeping the current run config and optimizer fresh.
 
-    This is intentionally distinct from resume: it supports scalar-Q to
-    categorical-Q initialization and does not restore steps, optimizer state,
+    This is intentionally distinct from resume: it supports both scalar-Q /
+    categorical-Q migrations and does not restore steps, optimizer state,
     training stage, support, or early-stopping state. When requested, the
     action projection is rebased so the destination replay's normalization
     statistics are retained without changing the initialized projection's
@@ -8391,15 +9016,17 @@ def initialize_critic_from_checkpoint(
     destination_categorical = state.critic.core.q_representation == "categorical"
     source_categorical = "core.q_support" in source_online
     scalar_to_categorical = destination_categorical and not source_categorical
+    categorical_to_scalar = source_categorical and not destination_categorical
+    representation_changed = scalar_to_categorical or categorical_to_scalar
     online_loaded, online_skipped = load_compatible(
         state.critic,
         source_online,
-        skip_q_heads=scalar_to_categorical,
+        skip_q_heads=representation_changed,
     )
     target_loaded, target_skipped = load_compatible(
         state.target_critic,
         source_target,
-        skip_q_heads=scalar_to_categorical,
+        skip_q_heads=representation_changed,
     )
     if affine_rebase_action_normalizer:
         required_action_parameters = {
@@ -8488,23 +9115,34 @@ def initialize_critic_from_checkpoint(
             "destination replay normalization statistics",
             flush=True,
         )
-    if scalar_to_categorical:
+    if representation_changed:
+        # Never partial-load even shape-compatible hidden Q layers across
+        # representations. Reset the entire online Q head, then copy to target.
+        if categorical_to_scalar:
+            for head in state.critic.core.q_heads:
+                for module in head.modules():
+                    if hasattr(module, "reset_parameters"):
+                        module.reset_parameters()
         state.target_critic.core.q_heads.load_state_dict(
             state.critic.core.q_heads.state_dict()
         )
+        state.critic_optimizer.state.clear()
+    print(f"[critic-init] source q_representation = {'categorical' if source_categorical else 'scalar'}; "
+          f"destination q_representation = {state.critic.core.q_representation}", flush=True)
+    print("[critic-init] loaded shape-compatible backbone/action pool/V heads; skipped optimizer state", flush=True)
 
     q_reinitialized = sorted(
         name
         for name in state.critic.state_dict()
         if name.startswith("core.q_heads.") or name == "core.q_support"
-    ) if scalar_to_categorical else []
+    ) if representation_changed else []
     print(
         "[critic-init] loaded parameters: "
         f"online={len(online_loaded)} target={len(target_loaded)} from {path}",
         flush=True,
     )
     print(
-        "[critic-init] reinitialized categorical Q parameters: "
+        f"[critic-init] reinitialized {state.critic.core.q_representation} Q parameters / Q heads: "
         + (", ".join(q_reinitialized) if q_reinitialized else "none"),
         flush=True,
     )

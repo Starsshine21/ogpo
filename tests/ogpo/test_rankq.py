@@ -239,7 +239,7 @@ def test_rankq_permutation_uses_other_transition_when_batch_has_multiple_rows():
     assert torch.equal(generated.permuted, actions.index_select(0, generated.permutation))
 
 
-def test_rankq_random_actions_use_paper_normalized_uniform_range():
+def test_rankq_random_actions_use_legal_normalized_uniform_range():
     actions = torch.full((32, 2, 1), 10.0)
     generated = make_rankq_actions(
         actions,
@@ -253,7 +253,8 @@ def test_rankq_random_actions_use_paper_normalized_uniform_range():
     )
 
     random_normalized = (generated.random - 10.0) / 2.0
-    assert bool((random_normalized >= -1.0).all() and (random_normalized <= 1.0).all())
+    assert bool((random_normalized >= -5.0).all() and (random_normalized <= 5.0).all())
+    assert bool((random_normalized.abs() > 1.0).any())
     assert random_normalized.min().item() < -0.5
     assert random_normalized.max().item() > 0.5
 

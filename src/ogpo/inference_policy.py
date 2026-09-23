@@ -382,6 +382,7 @@ def create_pi05_ogpo_inference_policy(
     )
     if is_pytorch:
         flow_policy_kwargs.update(
+            flow_action_dim=flow_action_dim,
             constant_noise_std=float(
                 flow_cfg.get(
                     "constant_noise_std", policy_payload.get("constant_noise_std", 0.005)

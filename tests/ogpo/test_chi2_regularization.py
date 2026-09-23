@@ -112,25 +112,42 @@ def test_ca_default_does_not_allocate_slow_policy():
     assert state.slow_policy is None
 
 
-def test_flash_chipo_uses_selected_transition_and_reports_metrics():
+@pytest.mark.parametrize('variant', ['chi2', 'ca_chi2'])
+def test_flash_chipo_uses_selected_transition_and_reports_metrics(variant):
     batch = make_synthetic_replay(
         num_samples=8, generated_horizon=4, executed_horizon=2, action_dim=2
     )
-    cfg = _config()
+    cfg = _config(variant=variant)
     state = build_train_state(cfg, batch)
     assert state.slow_policy is not None
     critic_update(state, batch, cfg)
 
     metrics = flash_actor_update(state, batch, cfg)
 
-    assert metrics["ogpo_variant"] == "chi2"
-    assert metrics["advantage_mode"] == "chi_po"
+    assert metrics["ogpo_variant"] == variant
+    assert metrics["advantage_mode"] == ('chi_po' if variant == 'chi2' else 'conservative')
     assert metrics["chi2_enabled"] == 1.0
     assert metrics["chi2_selected_logprob_normalizer"] == 8.0
     assert metrics["chi2_ratio_max"] <= 4.0
     assert metrics["actor_update_accepted"] == 1.0
     assert torch.isfinite(torch.tensor(metrics["actor_loss"]))
     assert all(parameter.grad is None for parameter in state.slow_policy.parameters())
+
+
+@pytest.mark.skipif(torch.cuda.device_count() < 4, reason='requires four policy-role GPUs')
+def test_flash_ca_chipo_four_device_roles():
+    batch = make_synthetic_replay(num_samples=4, generated_horizon=4, executed_horizon=2, action_dim=2)
+    cfg = _config(variant='ca_chi2')
+    cfg['actor'].update(compute_step_grad_diagnostics=False, gradient_microbatch_size=2)
+    state = build_train_state(cfg, batch, device='cuda:0')
+    state.old_policy.to('cuda:1')
+    state.slow_policy.to('cuda:2')
+    state.reference_policy.to('cuda:3')
+    metrics = flash_actor_update(state, batch, cfg)
+    assert metrics['chi2_enabled'] == 1
+    assert metrics['actor_update_accepted'] == 1
+    assert math.isfinite(metrics['post_update_reference_kl'])
+    assert all(p.grad is None for role in (state.old_policy, state.slow_policy, state.reference_policy) for p in role.parameters())
 
 
 def test_chipo_full_actor_path_uses_joint_ratio():

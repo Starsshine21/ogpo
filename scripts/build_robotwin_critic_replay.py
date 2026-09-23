@@ -89,10 +89,12 @@ def _episode_rows(
     required = {
         "image",
         "wrist_image",
+        "left_wrist_image",
         "state",
         "actions",
         "next_image",
         "next_wrist_image",
+        "next_left_wrist_image",
         "next_state",
         "timestamp",
     }
@@ -179,11 +181,13 @@ def _episode_rows(
                 "next_proprioception": next_states[index],
                 "images": {
                     "image_base": arrays["image"][index],
-                    "image_wrist": arrays["wrist_image"][index],
+                    "image_left_wrist": arrays["left_wrist_image"][index],
+                    "image_right_wrist": arrays["wrist_image"][index],
                 },
                 "next_images": {
                     "image_base": arrays["next_image"][index],
-                    "image_wrist": arrays["next_wrist_image"][index],
+                    "image_left_wrist": arrays["next_left_wrist_image"][index],
+                    "image_right_wrist": arrays["next_wrist_image"][index],
                 },
                 "done": float(dones[index]),
                 "success": float(success),

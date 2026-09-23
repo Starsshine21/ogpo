@@ -11,6 +11,7 @@ from .ensemble import ensemble_mean_std
 from .multimodal_critic import MultiHeadScalarQCritic, MultiHeadUdivlCritic
 from .types import ChunkBatch
 from .uncertainty import conformal_scale as compute_conformal_scale
+from .critic_raw10_evaluator import raw10_fidelity_metrics, off_diagonal_q_correlation_metrics
 
 
 def _critic_predictions(
@@ -228,10 +229,15 @@ def offline_calibration_metrics(
         metrics["categorical_saturation"] = float(
             ((probs[..., 0] + probs[..., -1]) > 0.5).float().mean().item()
         )
+        metrics["v_distributional_entropy"] = metrics["categorical_entropy"]
+        metrics["v_distributional_saturation"] = metrics["categorical_saturation"]
     if "q_entropy" in diagnostics:
         metrics["critic/q_entropy_mean"] = float(diagnostics["q_entropy"].mean().item())
     if "q_pairs" in diagnostics:
         q_pairs = diagnostics["q_pairs"]
+        if bool((config or {}).get("evaluation", {}).get("raw10_validation", False)):
+            raw_metrics = raw10_fidelity_metrics(q_pairs.flatten(0, 1), target)
+            metrics.update({key: value for key, value in raw_metrics.items() if isinstance(value, (int, float))})
         for member in range(q_pairs.shape[0]):
             metrics[f"critic/q_member_{member}_q1_mean"] = float(q_pairs[member, 0].mean().item())
             metrics[f"critic/q_member_{member}_q2_mean"] = float(q_pairs[member, 1].mean().item())
@@ -323,9 +329,7 @@ def validation_metrics_for_training(state, batch: ChunkBatch, config: dict) -> d
             _, _, diagnostics = _critic_predictions(state.critic, batch,
                 inference_batch_size=inference_batch_size, config=config)
             raw = diagnostics["q_pairs"].flatten(0, 1).float()
-            corr = torch.corrcoef(raw)
-            off = ~torch.eye(raw.shape[0], dtype=torch.bool)
-            metrics["raw10_q_head_correlation"] = float(corr[off].mean())
+            metrics["raw10_q_head_correlation"] = off_diagonal_q_correlation_metrics(raw)["mean_off_diagonal_q_correlation"]
             metrics["raw10_ensemble_std"] = float(raw.std(dim=0, unbiased=False).mean())
             state.critic.train(was_training)
     validation = {f"validation_{key}": value for key, value in metrics.items()}

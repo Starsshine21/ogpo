@@ -7,6 +7,7 @@ import gc
 import json
 import os
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import torch
@@ -20,6 +21,7 @@ from ogpo.metrics import add_run_metadata, create_metrics_writer
 from ogpo.evaluator import validation_metrics_for_training
 from ogpo.replay import (
     BalancedCriticReplay,
+    CompositeChunkBatch,
     OfflineChunkReplay,
     OutcomeBalancedCriticReplay,
     TaskBalancedCriticReplay,
@@ -428,13 +430,16 @@ def main() -> None:
         )
         del init_batch
         gc.collect()
+    distributed_paths = cfg.get("data", {}).get("distributed_dataset_paths") if distributed else None
     distributed_pattern = cfg.get("data", {}).get("distributed_dataset_path_pattern")
+    if distributed_paths and distributed_pattern:
+        raise ValueError("choose either distributed_dataset_paths or distributed_dataset_path_pattern")
     data_path = ROOT / (
         str(distributed_pattern).format(rank=rank)
         if distributed and distributed_pattern
         else cfg["data"]["dataset_path"]
     )
-    if not data_path.exists():
+    if not distributed_paths and not data_path.exists():
         if not args.synthetic_smoke:
             raise FileNotFoundError(
                 f"configured critic replay does not exist: {data_path}; "
@@ -446,10 +451,24 @@ def main() -> None:
             print(f"[critic] explicitly created synthetic smoke dataset at {data_path}")
         if distributed:
             dist.barrier()
-    # This cluster limits large per-process mmap regions.  Load normally,
-    # then immediately retain only this rank's complete episode shard.
-    batch = load_replay(data_path)
-    if distributed and not distributed_pattern:
+    if distributed_paths:
+        sources = []
+        next_episode_id = 0
+        for pattern in distributed_paths:
+            source_path = ROOT / str(pattern).format(rank=rank)
+            if not source_path.is_file():
+                raise FileNotFoundError(f"configured critic replay does not exist: {source_path}")
+            source = load_replay(source_path, mmap=True)
+            source = replace(source, episode_ids=source.episode_ids + next_episode_id)
+            next_episode_id = int(source.episode_ids.max()) + 1
+            sources.append(source)
+        batch = CompositeChunkBatch(sources)
+        print(f"[critic] file-backed replay sources={[str(p).format(rank=rank) for p in distributed_paths]} "
+              f"local_transitions={batch.batch_size}", flush=True)
+    else:
+        # Historical single-file runs keep their original loading semantics.
+        batch = load_replay(data_path)
+    if distributed and not distributed_pattern and not distributed_paths:
         batch = _episode_shard(batch, rank=rank, world_size=world_size)
     validation_path_value = cfg.get("data", {}).get(
         "distributed_validation_path" if distributed else "validation_path",
@@ -459,7 +478,7 @@ def main() -> None:
         validation_path = ROOT / validation_path_value
         if not validation_path.exists():
             raise FileNotFoundError(f"configured validation replay does not exist: {validation_path}")
-        validation_batch = load_replay(validation_path) if is_main else batch
+        validation_batch = load_replay(validation_path, mmap=bool(distributed_paths)) if is_main else batch
     else:
         validation_batch = batch
     data_cfg = cfg.get("data", {})

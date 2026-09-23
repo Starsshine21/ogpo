@@ -223,6 +223,58 @@ def test_actor_update_reports_success_and_smoothness_losses_when_enabled():
     assert metrics["action_smoothness"] >= 0.0
 
 
+def test_flash_actor_can_disable_all_reference_kl_computation(monkeypatch):
+    batch = make_synthetic_replay(
+        num_samples=8, generated_horizon=4, executed_horizon=2, action_dim=2
+    )
+    cfg = {
+        "critic": {"ensemble_size": 2, "hidden_dim": 32, "num_layers": 1},
+        "divl": {"num_atoms": 21, "v_min": -5.0, "v_max": 5.0},
+        "actor": {
+            "group_size": 2,
+            "hidden_dim": 32,
+            "reference_kl_enabled": False,
+            "reject_update_on_kl": True,
+            "post_update_kl_action": "rollback_cpu",
+            "max_policy_reference_kl": 0.0,
+        },
+        "flow": {"num_steps": 3, "selected_timestep": 1},
+        "regularization": {
+            "beta_kl": 0.0,
+            "lambda_fm": 0.0,
+            "lambda_success": 0.0,
+            "lambda_smooth": 0.0,
+        },
+    }
+    state = build_train_state(cfg, batch)
+    critic_update(state, batch, cfg)
+    optimizer_steps = 0
+    original_step = state.actor_optimizer.step
+
+    def forbidden_reference_forward(*args, **kwargs):
+        raise AssertionError("reference policy must not be evaluated")
+
+    def counted_step(*args, **kwargs):
+        nonlocal optimizer_steps
+        optimizer_steps += 1
+        return original_step(*args, **kwargs)
+
+    monkeypatch.setattr(
+        state.reference_policy, "transition_mean", forbidden_reference_forward
+    )
+    monkeypatch.setattr(state.actor_optimizer, "step", counted_step)
+
+    metrics = flash_actor_update(state, batch, cfg)
+
+    assert optimizer_steps == 1
+    assert metrics["reference_kl_enabled"] == 0.0
+    assert metrics["reference_kl"] == 0.0
+    assert metrics["post_update_reference_kl"] == 0.0
+    assert metrics["post_update_kl_exceeded"] == 0.0
+    assert metrics["actor_update_accepted"] == 1.0
+    assert metrics["ppo_clip_fraction"] >= 0.0
+
+
 def test_actor_guard_reports_first_stop_reason():
     cfg = {
         "actor": {"max_policy_reference_kl": 0.5, "max_critic_disagreement": 2.0, "max_support_distance": 3.0}

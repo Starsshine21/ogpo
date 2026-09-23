@@ -12,6 +12,58 @@ from .chunk_transition import compute_chunk_return, compute_transition_discount,
 from .types import ChunkBatch
 
 
+class CompositeChunkBatch:
+    """Sample from several file-backed replay shards without joining their images.
+
+    Small metadata/action tensors are joined for existing sampler and action
+    normalizer logic.  Full-resolution images stay in their original shards.
+    """
+
+    def __init__(self, sources: list[ChunkBatch]):
+        if not sources:
+            raise ValueError("composite replay needs at least one source")
+        image_keys = set(sources[0].images or {})
+        shape = sources[0].action_chunks.shape[1:]
+        if any(set(source.images or {}) != image_keys or source.action_chunks.shape[1:] != shape for source in sources):
+            raise ValueError("composite replay camera/action schema mismatch")
+        self.sources = tuple(sources)
+        self.offsets = [0]
+        for source in sources:
+            self.offsets.append(self.offsets[-1] + source.batch_size)
+        self.batch_size = self.offsets[-1]
+        self.task_ids = [task for source in sources for task in source.task_ids]
+        self.successes = torch.cat([source.successes for source in sources])
+        self.episode_ids = torch.cat([source.episode_ids for source in sources])
+        self.action_chunks = torch.cat([source.action_chunks for source in sources])
+        self.execution_masks = torch.cat([source.execution_masks for source in sources])
+        self.dones = torch.cat([source.dones for source in sources])
+        if all(source.mc_returns is not None for source in sources):
+            self.mc_returns = torch.cat([source.mc_returns for source in sources])
+        else:
+            self.mc_returns = None
+
+    def index_select(self, indices: torch.Tensor) -> ChunkBatch:
+        from .zarr_replay import concat_chunk_batches
+
+        indices = indices.to(dtype=torch.long, device="cpu").flatten()
+        if indices.numel() == 0:
+            raise ValueError("composite replay cannot select an empty batch")
+        if int(indices.min()) < 0 or int(indices.max()) >= self.batch_size:
+            raise IndexError("composite replay index out of bounds")
+        parts = []
+        positions = []
+        for source, start, stop in zip(self.sources, self.offsets[:-1], self.offsets[1:], strict=True):
+            selected = torch.nonzero((indices >= start) & (indices < stop), as_tuple=False).flatten()
+            if selected.numel():
+                parts.append(source.index_select(indices[selected] - start))
+                positions.append(selected)
+        if len(parts) == 1:
+            return parts[0]
+        joined = concat_chunk_batches(parts)
+        original_order = torch.cat(positions).argsort()
+        return joined.index_select(original_order)
+
+
 class OfflineChunkReplay(Dataset):
     """Fixed offline replay dataset for chunk transitions."""
 

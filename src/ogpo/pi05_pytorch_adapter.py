@@ -105,6 +105,9 @@ class PI05FlowCondition:
     """Batched, model-ready PI0.5 observation used by flow transitions."""
 
     observation: Any
+    # Scoped to this condition/microbatch, never persisted in checkpoints.
+    prefix_cache: dict = dataclasses.field(default_factory=dict, compare=False, repr=False)
+    prefix_source: Any = dataclasses.field(default=None, compare=False, repr=False)
 
     @property
     def state(self) -> torch.Tensor:
@@ -116,15 +119,20 @@ class PI05FlowCondition:
 
     def repeat_interleave(self, repeats: int) -> "PI05FlowCondition":
         return PI05FlowCondition(
-            _tree_map_tensor(self.observation, lambda tensor: tensor.repeat_interleave(repeats, dim=0))
+            _tree_map_tensor(self.observation, lambda tensor: tensor.repeat_interleave(repeats, dim=0)),
+            prefix_source=(self, 'repeat', repeats),
         )
 
     def index_select(self, indices: torch.Tensor) -> "PI05FlowCondition":
-        return PI05FlowCondition(_tree_index_select(self.observation, indices))
+        return PI05FlowCondition(_tree_index_select(self.observation, indices),
+                                prefix_source=(self, 'index', indices))
 
     def to(self, device: torch.device | str) -> "PI05FlowCondition":
+        if self.state.device == torch.device(device):
+            return self
         return PI05FlowCondition(
-            _tree_map_tensor(self.observation, lambda tensor: tensor.to(device))
+            _tree_map_tensor(self.observation, lambda tensor: tensor.to(device)),
+            prefix_source=(self, 'device', device),
         )
 
 
@@ -148,6 +156,7 @@ class PI05ReplayConditionBuilder:
     output_transform: Any | None = None
     model_action_dim: int | None = None
     environment_action_dim: int | None = None
+    flow_action_dim: int | None = None
 
     def _raw_sample(self, batch, index: int, *, next_observation: bool = False) -> dict[str, Any]:
         images = batch.next_images if next_observation else batch.images
@@ -191,6 +200,7 @@ class PI05ReplayConditionBuilder:
     def action_chunks_to_flow(self, batch) -> torch.Tensor:
         if self.environment_action_dim is None:
             raise RuntimeError("PI0.5 environment action dimension is not configured")
+        flow_dim = self.flow_action_dim or self.environment_action_dim
         transformed_actions = []
         for index in range(batch.batch_size):
             raw = self._raw_sample(batch, index)
@@ -198,11 +208,15 @@ class PI05ReplayConditionBuilder:
             transformed = self.input_transform(raw)
             if "actions" not in transformed:
                 raise KeyError("PI0.5 input transform did not return normalized actions")
-            transformed_actions.append(
-                np.asarray(transformed["actions"], dtype=np.float32)[..., : self.environment_action_dim]
-            )
+            transformed_actions.append(np.asarray(transformed["actions"], dtype=np.float32))
+        actions = np.stack(transformed_actions)
+        if actions.shape[-1] < flow_dim:
+            padded = np.zeros((*actions.shape[:-1], flow_dim), dtype=actions.dtype)
+            padded[..., : actions.shape[-1]] = actions
+            actions = padded
+        actions = actions[..., : flow_dim]
         return torch.as_tensor(
-            np.stack(transformed_actions),
+            actions,
             device=batch.action_chunks.device,
             dtype=batch.action_chunks.dtype,
         )
@@ -216,15 +230,16 @@ class PI05ReplayConditionBuilder:
         if self.output_transform is None or self.model_action_dim is None or self.environment_action_dim is None:
             raise RuntimeError("PI0.5 output action transform is not configured")
         batch_size = flat_actions.shape[0]
-        if flat_actions.shape[1] % self.environment_action_dim:
-            raise ValueError("flat PI0.5 actions are not divisible by the environment action dimension")
-        horizon = flat_actions.shape[1] // self.environment_action_dim
-        flow_actions = flat_actions.detach().reshape(batch_size, horizon, self.environment_action_dim).cpu().numpy()
+        flow_dim = self.flow_action_dim or self.environment_action_dim
+        if flat_actions.shape[1] % flow_dim:
+            raise ValueError("flat PI0.5 actions are not divisible by the flow action dimension")
+        horizon = flat_actions.shape[1] // flow_dim
+        flow_actions = flat_actions.detach().reshape(batch_size, horizon, flow_dim).cpu().numpy()
         states = model_states.detach().cpu().numpy() if model_states is not None else None
         environment_actions = []
         for index in range(batch_size):
             padded = np.zeros((horizon, self.model_action_dim), dtype=flow_actions.dtype)
-            padded[..., : self.environment_action_dim] = flow_actions[index]
+            padded[..., : flow_dim] = flow_actions[index]
             output = {"actions": padded}
             if states is not None:
                 output["state"] = states[index]
@@ -255,6 +270,7 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         backend: nn.Module,
         *,
         environment_action_dim: int,
+        flow_action_dim: int | str | None = None,
         num_steps: int = 10,
         stochastic_variance: float = 0.04,
         sde_mode: str = "gaussian_adapter",
@@ -267,6 +283,7 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         checkpoint_dir: str | None = None,
         train_config_name: str | None = None,
         backend_train_mode: str = "none",
+        frozen_prefix_cache: bool = False,
         register_backend: bool = True,
         backend_trainable_names: tuple[str, ...] = (),
         backend_parameter_snapshot: dict[str, torch.Tensor] | None = None,
@@ -274,10 +291,17 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         model_horizon = int(backend.config.action_horizon)
         model_action_dim = int(backend.config.action_dim)
         environment_action_dim = int(environment_action_dim)
+        if flow_action_dim is None:
+            flow_action_dim = environment_action_dim
+        elif flow_action_dim == "model":
+            flow_action_dim = model_action_dim
+        flow_action_dim = int(flow_action_dim)
         if environment_action_dim > model_action_dim:
             raise ValueError("environment action dimension cannot exceed PI0.5 model action dimension")
+        if not environment_action_dim <= flow_action_dim <= model_action_dim:
+            raise ValueError("flow action dimension must lie between environment and model dimensions")
         super().__init__(
-            action_dim=model_horizon * environment_action_dim,
+            action_dim=model_horizon * flow_action_dim,
             num_steps=num_steps,
             stochastic_variance=stochastic_variance,
             sde_mode=sde_mode,
@@ -297,12 +321,16 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         self.model_horizon = model_horizon
         self.model_action_dim = model_action_dim
         self.environment_action_dim = environment_action_dim
+        self.flow_action_dim = flow_action_dim
         self.residual_hidden_dim = int(residual_hidden_dim)
         self.residual_enabled = bool(residual_enabled)
         self.condition_builder = condition_builder
         self.checkpoint_dir = checkpoint_dir
         self.train_config_name = train_config_name
         self.backend_train_mode = backend_train_mode
+        self.frozen_prefix_cache = bool(frozen_prefix_cache)
+        if self.frozen_prefix_cache and backend_train_mode == "full":
+            raise ValueError("frozen_prefix_cache requires a frozen PaliGemma backbone")
         object.__setattr__(
             self,
             "_backend_parameter_snapshot",
@@ -353,6 +381,8 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
             self.backend.eval()
         elif self._backend_parameter_snapshot is None:
             self.backend.train(mode)
+        if self.frozen_prefix_cache:
+            self.backend.paligemma_with_expert.paligemma.eval()
         return self
 
     def condition_batch_size(self, condition: PI05FlowCondition) -> int:
@@ -391,7 +421,10 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
             model_states=model_states,
         )
         if flat_actions.requires_grad:
-            converted = converted + flat_actions - flat_actions.detach()
+            flow_dim = self.flow_action_dim or self.environment_action_dim
+            endpoint = flat_actions.reshape(flat_actions.shape[0], -1, flow_dim)
+            env_endpoint = endpoint[..., : self.environment_action_dim]
+            converted = converted + env_endpoint - env_endpoint.detach()
         return converted
 
     def predict_velocity(
@@ -401,9 +434,10 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         timestep: torch.Tensor,
     ) -> torch.Tensor:
         batch = x_t.shape[0]
-        x_env = x_t.reshape(batch, self.model_horizon, self.environment_action_dim)
+        x_flow = x_t.reshape(batch, self.model_horizon, self.flow_action_dim)
+        x_env = x_flow[..., : self.environment_action_dim]
         x_model = x_env.new_zeros(batch, self.model_horizon, self.model_action_dim)
-        x_model[..., : self.environment_action_dim] = x_env
+        x_model[..., : self.flow_action_dim] = x_flow
         time = timestep.reshape(batch, -1)[:, 0].to(dtype=torch.float32)
         if self._backend_parameter_snapshot is not None:
             class _VelocityCall(nn.Module):
@@ -430,6 +464,40 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
                 (condition.observation, x_model, time),
                 strict=False,
             )
+        elif self.frozen_prefix_cache:
+            cache_key = id(self.backend)
+            if cache_key not in condition.prefix_cache and condition.prefix_source is not None:
+                self._inherit_prefix_cache(condition)
+            if cache_key not in condition.prefix_cache:
+                with torch.no_grad():
+                    self.backend.paligemma_with_expert.paligemma.eval()
+                    images, masks, tokens, token_masks, model_state = self.backend._preprocess_observation(
+                        condition.observation, train=False
+                    )
+                    prefix, pad, att = self.backend.embed_prefix(images, masks, tokens, token_masks)
+                    module = importlib.import_module(self.backend.__class__.__module__)
+                    attention = self.backend._prepare_attention_masks_4d(module.make_att_2d_masks(pad, att))
+                    # Match PI0Pytorch.sample_actions: the cached prefix uses
+                    # eager attention. SDPA rejects this backend's float32
+                    # additive mask with bfloat16 queries on the pinned stack.
+                    language_model = getattr(
+                        self.backend.paligemma_with_expert.paligemma,
+                        "language_model", None,
+                    )
+                    if language_model is not None:
+                        language_model.config._attn_implementation = "eager"
+                    _, kv = self.backend.paligemma_with_expert.forward(
+                        attention_mask=attention,
+                        position_ids=torch.cumsum(pad, dim=1) - 1,
+                        inputs_embeds=[prefix, None], use_cache=True,
+                    )
+                    if kv is None:
+                        raise RuntimeError("Frozen prefix did not return KV cache")
+                    condition.prefix_cache[cache_key] = (model_state, pad, kv)
+            model_state, pad, kv = condition.prefix_cache[cache_key]
+            # use_cache=False in denoise_step reads prefix KV without appending
+            # suffix tokens; gradients flow through the action expert only.
+            base_model = self.backend.denoise_step(model_state, pad, kv, x_model, time)
         elif self.backend_train_mode != "none":
             base_model = _predict_pi05_backend_velocity(
                 self.backend,
@@ -447,12 +515,54 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
                     time,
                     train=False,
                 )
-        base = base_model[..., : self.environment_action_dim].to(dtype=x_env.dtype)
+        base_model = base_model.to(dtype=x_env.dtype)
+        base = base_model[..., : self.environment_action_dim]
         time_features = time.to(dtype=x_env.dtype)[:, None, None].expand(batch, self.model_horizon, 1)
         if self.residual_enabled:
             residual = self.residual(torch.cat([x_env, base, time_features], dim=-1))
             base = base + residual
-        return base.reshape(batch, -1)
+        base_model[..., : self.environment_action_dim] = base
+        return base_model[..., : self.flow_action_dim].reshape(batch, -1)
+
+    def _inherit_prefix_cache(self, condition):
+        """Encode a role's original state batch once, then slice/repeat KV.
+
+        Each backend has its own cache key: never mix full-policy roles.
+        Derived Cache objects contain immutable prefix tensors and suffix
+        forwards use_cache=False, including checkpoint recomputation.
+        """
+        parent, operation, argument = condition.prefix_source
+        key = id(self.backend)
+        if key not in parent.prefix_cache:
+            if parent.prefix_source is not None:
+                self._inherit_prefix_cache(parent)
+            else:
+                device = next(self.backend.parameters()).device
+                root = PI05FlowCondition(_tree_map_tensor(parent.observation, lambda t: t.to(device)))
+                # Run one no-grad velocity to initialize the original prefix.
+                # Cache construction is shared with the normal cached path.
+                with torch.no_grad():
+                    self.predict_velocity(
+                        torch.zeros(root.batch_size, self.action_dim, device=device),
+                        root, torch.ones(root.batch_size, device=device),
+                    )
+                parent.prefix_cache[key] = root.prefix_cache[key]
+        model_state, pad, kv = parent.prefix_cache[key]
+        def transform(tensor):
+            if operation == 'repeat':
+                return tensor.repeat_interleave(argument, dim=0)
+            if operation == 'index':
+                return tensor.index_select(0, argument.to(tensor.device))
+            return tensor  # Prefix already lives on this backend's device.
+        if isinstance(kv, torch.Tensor):
+            derived_kv = transform(kv)
+        else:
+            from transformers.cache_utils import DynamicCache
+            legacy = kv.to_legacy_cache()
+            derived_kv = DynamicCache.from_legacy_cache(
+                tuple(tuple(transform(t) for t in layer) for layer in legacy)
+            )
+        condition.prefix_cache[key] = (transform(model_state), transform(pad), derived_kv)
 
     def clone_adapter(self, *, trainable: bool = False) -> "PI05PytorchFlowPolicy":
         backend_snapshot = {
@@ -463,6 +573,7 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
         clone = PI05PytorchFlowPolicy(
             self.backend,
             environment_action_dim=self.environment_action_dim,
+            flow_action_dim=self.flow_action_dim,
             num_steps=self.num_steps,
             stochastic_variance=float(self.log_std.detach().exp().square().mean().item()),
             sde_mode=self.sde_mode,
@@ -475,6 +586,7 @@ class PI05PytorchFlowPolicy(OpenPIStochasticFlowPolicy):
             checkpoint_dir=self.checkpoint_dir,
             train_config_name=self.train_config_name,
             backend_train_mode="none",
+            frozen_prefix_cache=self.frozen_prefix_cache,
             register_backend=False,
             backend_trainable_names=self._backend_trainable_names,
             backend_parameter_snapshot=backend_snapshot,
@@ -615,6 +727,7 @@ def load_pi05_pytorch_flow_policy(
     image_container_key: str | None = None,
     transpose_images_to_chw: bool = False,
     environment_action_dim: int,
+    flow_action_dim: int | str | None = None,
     num_steps: int,
     stochastic_variance: float,
     sde_mode: str,
@@ -625,6 +738,7 @@ def load_pi05_pytorch_flow_policy(
     residual_enabled: bool = True,
     device: torch.device | str,
     backend_train_mode: str = "none",
+    frozen_prefix_cache: bool = False,
 ) -> PI05PytorchFlowPolicy:
     """Load a converted PI0.5 checkpoint and construct the OGPO adapter."""
     checkpoint_dir = Path(checkpoint_dir).expanduser().resolve()
@@ -655,10 +769,16 @@ def load_pi05_pytorch_flow_policy(
         transpose_images_to_chw=transpose_images_to_chw,
         model_action_dim=int(trained_policy._model.config.action_dim),
         environment_action_dim=int(environment_action_dim),
+        flow_action_dim=(
+            int(trained_policy._model.config.action_dim)
+            if flow_action_dim == "model"
+            else (int(flow_action_dim) if flow_action_dim is not None else int(environment_action_dim))
+        ),
     )
     return PI05PytorchFlowPolicy(
         trained_policy._model,
         environment_action_dim=environment_action_dim,
+        flow_action_dim=flow_action_dim,
         num_steps=num_steps,
         stochastic_variance=stochastic_variance,
         sde_mode=sde_mode,
@@ -671,4 +791,5 @@ def load_pi05_pytorch_flow_policy(
         checkpoint_dir=str(checkpoint_dir),
         train_config_name=train_config_name,
         backend_train_mode=backend_train_mode,
+        frozen_prefix_cache=frozen_prefix_cache,
     ).to(device)

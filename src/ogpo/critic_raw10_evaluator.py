@@ -14,6 +14,11 @@ RAW_Q_HEADS = 10
 DIVL_PAIRS = 5
 
 
+def _require_finite(*values: torch.Tensor) -> None:
+    if any(not bool(torch.isfinite(value).all()) for value in values):
+        raise FloatingPointError("non-finite scalar/raw10 evaluator input")
+
+
 def raw10_from_q_pairs(q_pairs: torch.Tensor) -> torch.Tensor:
     """Flatten ``[5,2,...]`` as Q11,Q12,...,Q51,Q52 without clipping."""
     if q_pairs.ndim < 3 or q_pairs.shape[:2] != (DIVL_PAIRS, 2):
@@ -119,6 +124,7 @@ def raw10_fidelity_metrics(raw_q: torch.Tensor, mc_return: torch.Tensor) -> dict
     """Evaluate all ten heads; pair-min is intentionally absent."""
     if raw_q.ndim != 2 or raw_q.shape[0] != RAW_Q_HEADS:
         raise ValueError("raw_q must have shape [10,N]")
+    _require_finite(raw_q, mc_return)
     target = mc_return.detach().float().flatten().cpu()
     raw = raw_q.detach().float().cpu()
     if raw.shape[1] != target.numel():
@@ -235,33 +241,83 @@ def focused_return_metrics(
     }
 
 
+def scalar_td_fidelity_metrics(raw_q: torch.Tensor, member_targets: torch.Tensor) -> dict[str, Any]:
+    """Member-local TD errors; raw10-mean compares mean Q with mean member target."""
+    if raw_q.ndim != 2 or raw_q.shape[0] != RAW_Q_HEADS:
+        raise ValueError("raw_q must have shape [10,N]")
+    if member_targets.shape != (DIVL_PAIRS, raw_q.shape[1]):
+        raise ValueError("member_targets must have shape [5,N]")
+    _require_finite(raw_q, member_targets)
+    raw, targets = raw_q.detach().float().cpu(), member_targets.detach().float().cpu()
+    errors = raw - targets.repeat_interleave(2, dim=0)
+    mean_error = raw.mean(dim=0) - targets.mean(dim=0)
+    rmses = errors.square().mean(dim=1).sqrt()
+    return {
+        "td_rmse": float(mean_error.square().mean().sqrt()),
+        "td_mae": float(mean_error.abs().mean()),
+        "td_error_p90": float(torch.quantile(mean_error.abs(), 0.9)),
+        "td_rawhead_rmse": float(errors.square().mean().sqrt()),
+        "member_td_rmse": rmses.tolist(),
+        "member_td_mae": errors.abs().mean(dim=1).tolist(),
+        "member_td_error_p90": torch.quantile(errors.abs(), 0.9, dim=1).tolist(),
+        "worst_head_td_rmse": float(rmses.max()),
+        "worst_td_head_index": int(rmses.argmax()),
+    }
+
+
 def same_state_action_ranking_metrics(
     positive_q: torch.Tensor,
     negative_q: torch.Tensor,
 ) -> dict[str, Any]:
-    """Compare dataset actions to K same-state negatives with all ten Q heads."""
+    """Measure model-imposed same-state ordering across all ten Q heads.
+
+    These are synthetic-relation diagnostics, not action-return correctness.
+    Legacy ``*_rank_*`` keys remain for old reports; new consumers should use
+    the explicitly neutral ``*_ordering_rate`` names.
+    """
     if positive_q.ndim != 2 or positive_q.shape[0] != RAW_Q_HEADS:
         raise ValueError("positive_q must have shape [10,B]")
     if negative_q.ndim != 3 or negative_q.shape[1:] != positive_q.shape:
         raise ValueError("negative_q must have shape [K,10,B]")
+    _require_finite(positive_q, negative_q)
     margins = positive_q.unsqueeze(0) - negative_q
     conservative = margins.min(dim=1).values
-    member_accuracy = (margins > 0).float().mean(dim=(0, 2))
+    head_ordering = margins > 0
+    per_head_ordering = head_ordering.float().mean(dim=(0, 2))
+    ensemble_mean_margins = positive_q.mean(dim=0).unsqueeze(0) - negative_q.mean(dim=1)
+    head_ordering_rate = float(head_ordering.float().mean().item())
+    ensemble_mean_ordering_rate = float((ensemble_mean_margins > 0).float().mean().item())
+    unanimous_rate = float((conservative > 0).float().mean().item())
     metrics: dict[str, Any] = {
-        "raw10_action_rank_mean": float((margins > 0).float().mean().item()),
-        "raw10_action_rank_unanimous": float((conservative > 0).float().mean().item()),
-        "member_action_rank_acc": [float(value) for value in member_accuracy.tolist()],
-        "raw10_member_action_rank_mean": float(member_accuracy.mean().item()),
-        "raw10_member_action_rank_min": float(member_accuracy.min().item()),
+        "head_ordering_rate": head_ordering_rate,
+        "ensemble_mean_ordering_rate": ensemble_mean_ordering_rate,
+        "unanimous_rate": unanimous_rate,
+        "per_head_ordering_rate": [float(value) for value in per_head_ordering.tolist()],
+        # Backward-compatible aliases for historical reports.
+        "raw10_action_rank_mean": head_ordering_rate,
+        "raw10_action_rank_unanimous": unanimous_rate,
+        "member_action_rank_acc": [float(value) for value in per_head_ordering.tolist()],
+        "raw10_member_action_rank_mean": float(per_head_ordering.mean().item()),
+        "raw10_member_action_rank_min": float(per_head_ordering.min().item()),
         "raw10_member_action_rank_std": float(
-            member_accuracy.std(unbiased=False).item()
+            per_head_ordering.std(unbiased=False).item()
         ),
         "raw10_mean_action_margin": float(margins.mean().item()),
         "raw10_min_action_margin": float(conservative.mean().item()),
         "raw10_min_action_margin_global": float(conservative.min().item()),
         "raw10_action_margin_p10": float(torch.quantile(conservative.float(), 0.1).item()),
     }
-    for index, value in enumerate(member_accuracy.tolist()):
+    slopes = torch.sigmoid(-margins.float())
+    for prefix, values in (("margin", margins), ("worst_head_margin", conservative)):
+        for suffix, quantile in (("median", 0.5), ("p10", 0.1), ("p90", 0.9)):
+            metrics[f"{prefix}_{suffix}"] = float(torch.quantile(values.float(), quantile))
+    metrics.update({
+        "softplus_slope_mean": float(slopes.mean()),
+        "softplus_slope_median": float(torch.quantile(slopes, 0.5)),
+        "softplus_slope_p90": float(torch.quantile(slopes, 0.9)),
+        "softplus_slope_below_1e2": float((slopes < 1e-2).float().mean()),
+    })
+    for index, value in enumerate(per_head_ordering.tolist()):
         metrics[f"member_action_rank_acc_{index}"] = float(value)
     return metrics
 
@@ -276,6 +332,7 @@ def actor_signal_metrics(
     """Call the production CA and CA+ChiPO functions with the initialization ratio 1."""
     if candidate_q.ndim != 3 or candidate_q.shape[0] != RAW_Q_HEADS:
         raise ValueError("candidate_q must have shape [10,B,G]")
+    _require_finite(candidate_q)
     ca, _, ca_stats = group_relative_conservative_advantage(
         candidate_q,
         positive_margin=positive_margin,
@@ -297,7 +354,26 @@ def actor_signal_metrics(
     filtered = ca_nonzero & ~final_nonzero
     ca_abs_mean = float(ca.abs().mean().item())
     final_abs_mean = float(final.abs().mean().item())
+    group_size = candidate_q.shape[-1]
+    if group_size < 2:
+        raise ValueError("actor signal requires at least two candidates")
+    # No pre-existing worst-head candidate ranking definition: use mean-Q
+    # winner versus the leave-one-out mean of other candidates, then raw10 min.
+    best = candidate_q.mean(dim=0).argmax(dim=-1)
+    best_q = candidate_q.gather(2, best[None, :, None].expand(RAW_Q_HEADS, -1, 1)).squeeze(-1)
+    other_mean = (candidate_q.sum(dim=-1) - best_q) / (group_size - 1)
+    worst_margin = (best_q - other_mean).min(dim=0).values
+    disagreement = candidate_q.std(dim=0, unbiased=False)
     return {
+        "actor_raw10_disagreement_mean": float(disagreement.mean()),
+        "actor_raw10_disagreement_median": float(torch.quantile(disagreement, 0.5)),
+        "actor_raw10_disagreement_p90": float(torch.quantile(disagreement, 0.9)),
+        "actor_state_disagreement_mean": float(disagreement.mean(dim=-1).mean()),
+        "actor_state_disagreement_p90": float(torch.quantile(disagreement.mean(dim=-1), 0.9)),
+        "worst_head_ranking_accuracy": float((worst_margin > 0).float().mean()),
+        "worst_head_margin_mean": float(worst_margin.mean()),
+        "ca_mean": float(ca.mean()),
+        "ca_abs_p90": float(torch.quantile(ca.abs(), 0.9)),
         "ca_positive_ratio": float((ca > 0).float().mean().item()),
         "ca_negative_ratio": float((ca < 0).float().mean().item()),
         "ca_zero_ratio": float((ca == 0).float().mean().item()),

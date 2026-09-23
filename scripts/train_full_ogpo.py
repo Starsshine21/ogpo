@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from ogpo.metrics import add_run_metadata, create_metrics_writer
 from ogpo.origin_cache import load_or_build_origin_feature_cache
 from ogpo.replay import (
+    CompositeChunkBatch,
     OfflineChunkReplay,
     load_replay,
     prepare_replay_from_config,
@@ -61,8 +62,25 @@ class TaskCycleActorReplay:
         return self.batch.index_select(pool.index_select(0, offsets))
 
 
+class IndexedActorReplay:
+    """Sample a subset of a file-backed replay without materializing its images."""
+
+    def __init__(self, batch, indices: torch.Tensor):
+        self.batch = batch
+        self.indices = indices.to(dtype=torch.long, device="cpu").flatten()
+        if self.indices.numel() == 0:
+            raise ValueError("actor replay subset is empty")
+
+    def __len__(self) -> int:
+        return self.indices.numel()
+
+    def sample(self, batch_size: int, *, generator: torch.Generator):
+        offsets = torch.randint(len(self), (int(batch_size),), generator=generator)
+        return self.batch.index_select(self.indices.index_select(0, offsets))
+
+
 def load_actor_training_batch(root: Path, data_config: dict):
-    """Load one replay or concatenate every configured prepared replay shard."""
+    """Load prepared shards with images file-backed; retain old raw-replay path."""
     configured_paths = data_config.get("dataset_paths")
     if configured_paths is None:
         configured_paths = [data_config["dataset_path"]]
@@ -72,6 +90,8 @@ def load_actor_training_batch(root: Path, data_config: dict):
         load_replay(root / path, mmap=len(configured_paths) > 1)
         for path in configured_paths
     ]
+    if len(batches) > 1 and bool(data_config.get("dataset_preprocessed", False)):
+        return CompositeChunkBatch(batches)
     batch = batches[0] if len(batches) == 1 else concat_chunk_batches(batches)
     return prepare_replay_from_config(batch, data_config)
 
@@ -247,17 +267,25 @@ def main() -> None:
         )
     lambda_success = float(cfg.get("regularization", {}).get("lambda_success", 0.0))
     success_bc_enabled = lambda_success > 0.0
-    success_batch = (
-        split_success_buffers(batch).get("success") if success_bc_enabled else None
+    success_indices = (
+        torch.nonzero(batch.successes.bool(), as_tuple=False).flatten()
+        if success_bc_enabled else torch.empty(0, dtype=torch.long)
     )
-    success_replay = OfflineChunkReplay(success_batch) if success_batch is not None else None
+    success_replay = (
+        IndexedActorReplay(batch, success_indices)
+        if success_indices.numel() else None
+    )
     print(
         "[full] regularization "
         f"lambda_success={lambda_success:.12g} "
         f"success_bc_enabled={int(success_bc_enabled)}",
         flush=True,
     )
-    state = build_train_state(cfg, batch, device=cfg["training"].get("device", "cpu"))
+    state_init_batch = (
+        batch.index_select(torch.arange(min(8, batch.batch_size)))
+        if isinstance(batch, CompositeChunkBatch) else batch
+    )
+    state = build_train_state(cfg, state_init_batch, device=cfg["training"].get("device", "cpu"))
     print(
         "[full] flow_sde "
         f"mode={state.policy.sde_mode} "
