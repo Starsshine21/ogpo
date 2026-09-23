@@ -60,7 +60,16 @@ execution masks, trajectory outcomes, returns, task/episode IDs, language,
 proprioception and three image streams. The data builder checks the camera
 schema. Replays, model weights and simulator assets must be obtained separately.
 
-To prepare data from dense RoboTwin episodes, first supply a split manifest
+Convert each downloaded RoboTwin2.0 clean50 task into dense episodes first
+(the converter requires `h5py`):
+
+```bash
+python -m pip install h5py
+python scripts/convert_robotwin2_raw_to_dense.py --input /path/to/task.zip --output /path/to/clean50/dense --task adjust_bottle --limit 50
+```
+
+Repeat for all ten tasks. To prepare base rollout data from dense RoboTwin
+episodes, first supply a split manifest
 with top-level `train` and `heldout` lists, each entry containing a `source`
 episode directory. Preserve episode IDs and the 900/100 split:
 
@@ -73,8 +82,7 @@ python scripts/prepare_threecam_critic_init.py --source data/base_threecam90/tra
 
 Repeat the train/demo shard commands for ranks 1–3. The raw dense episode
 format expected by `build_robotwin_critic_replay.py` is described in its
-`_episode_rows` function. The official demo needs conversion to that format
-before running `build_threecam_demo_shard.py`.
+`_episode_rows` function.
 
 ## Train
 
